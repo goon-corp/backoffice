@@ -3,6 +3,8 @@ import App from "./App";
 import { authMiddleware } from "./Middleware/authMiddleware";
 import Login from "./Pages/Login";
 import HeaderLayout from "./Layout/HeaderLayout";
+import GestionUser from "./Pages/GestionUser";
+import EditionUser from "./Pages/EditionUser";
 
 export const routes: RouteObject[] = [
 	{
@@ -13,11 +15,11 @@ export const routes: RouteObject[] = [
 				middleware: [authMiddleware],
 				element: <App />,
 			},
-			// {
-			// 	path: "/gestion-user",
-			// 	middleware: [authMiddleware],
-			// 	element: <GestionUser />,
-			// },
+			{
+				path: "/gestion-user",
+				middleware: [authMiddleware],
+				element: <GestionUser />,
+			},
 			// {
 			// 	path: "/gestion-ressource",
 			// 	middleware: [authMiddleware],
@@ -43,17 +45,17 @@ export const routes: RouteObject[] = [
 			// 	middleware: [authMiddleware],
 			// 	element: <Register />,
 			// },
-			// {
-			// 	path: "user",
-			// 	middleware: [authMiddleware],
-			// 	children: [
-			// 		{ path: "ajout-utilisateur", Component: AjoutUser },
-			// 		{
-			// 			path: "edition",
-			// 			children: [{ path: ":id", Component: EditionUser }],
-			// 		},
-			// 	],
-			// },
+			{
+				path: "user",
+				middleware: [authMiddleware],
+				children: [
+					// { path: "ajout-utilisateur", Component: AjoutUser },
+					{
+						path: "edition",
+						children: [{ path: ":id", Component: EditionUser }],
+					},
+				],
+			},
 			// {
 			// 	path: "ressource",
 			// 	middleware: [authMiddleware],
