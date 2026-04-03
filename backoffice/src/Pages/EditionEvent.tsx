@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useGetRessourceStatuses, useGetRessourceConfidentialityTypes } from "../hooks/useRessource";
+import { useGetRessource, useGetRessourceStatuses, useGetRessourceConfidentialityTypes } from "../hooks/useRessource";
 import { useGetEventByRessource, useUpdateEvent } from "../hooks/useEvent";
-import type { ReturnRessourceDto } from "../Types/RessourceTypes";
 
 type FormData = {
 	title: string;
@@ -24,19 +23,20 @@ function toDatetimeLocal(iso: string): string {
 	return iso.slice(0, 16);
 }
 
-export default function EditionEvent({ ressource }: { ressource: ReturnRessourceDto }) {
+export default function EditionEvent({ id }: { id: string }) {
 	const navigate = useNavigate();
+	const { data: ressource } = useGetRessource(id);
 	const { mutate: updateEvent, isPending } = useUpdateEvent();
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } = useGetRessourceConfidentialityTypes();
-	const { data: event, isLoading: isLoadingEvent } = useGetEventByRessource(ressource.id);
+	const { data: event, isLoading: isLoadingEvent } = useGetEventByRessource(id);
 
 	const [formData, setFormData] = useState<FormData>({
-		title: ressource.title ?? "",
-		description: ressource.description ?? "",
-		status_id: ressource.status?.id ?? "",
-		confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
-		tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+		title: "",
+		description: "",
+		status_id: "",
+		confidentiality_type_id: "",
+		tags: "",
 		is_virtual: false,
 		date_start: "",
 		date_end: "",
@@ -46,15 +46,19 @@ export default function EditionEvent({ ressource }: { ressource: ReturnRessource
 	const [initialized, setInitialized] = useState(false);
 	const [errors, setErrors] = useState<FormErrors>({});
 
-	if (!initialized && event) {
-		setFormData((prev) => ({
-			...prev,
+	if (!initialized && ressource && event) {
+		setFormData({
+			title: ressource.title ?? "",
+			description: ressource.description ?? "",
+			status_id: ressource.status?.id ?? "",
+			confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
+			tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
 			is_virtual: event.is_virtual,
 			date_start: toDatetimeLocal(event.date_start),
 			date_end: toDatetimeLocal(event.date_end),
 			event_link: event.event_link ?? "",
 			location: event.location ?? "",
-		}));
+		});
 		setInitialized(true);
 	}
 
@@ -83,7 +87,7 @@ export default function EditionEvent({ ressource }: { ressource: ReturnRessource
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors({});
-		if (!validate() || !event) return;
+		if (!validate() || !event || !ressource) return;
 
 		updateEvent(
 			{

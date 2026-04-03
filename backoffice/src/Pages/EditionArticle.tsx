@@ -1,15 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
+	useGetRessource,
 	useGetRessourceStatuses,
 	useGetRessourceConfidentialityTypes,
 } from "../hooks/useRessource";
 import {
-	useGetArticle,
-	useGetArticles,
+	useGetArticleByRessource,
 	useUpdateArticle,
 } from "../hooks/useArticle";
-import type { ReturnRessourceDto } from "../Types/RessourceTypes";
 
 type FormData = {
 	title: string;
@@ -22,32 +21,36 @@ type FormData = {
 
 type FormErrors = Partial<Record<keyof FormData | "general", string>>;
 
-export default function EditionArticle(id: string) {
+export default function EditionArticle({ id }: { id: string }) {
 	const navigate = useNavigate();
+	const { data: ressource } = useGetRessource(id);
 	const { mutate: updateArticle, isPending } = useUpdateArticle();
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } =
 		useGetRessourceConfidentialityTypes();
-	const { data: article, isLoading: isLoadingArticle } = useGetArticle(id);
-
-	// const article = useMemo(
-	// 	() => articles.find((a) => a.ressource_id === ressource.id),
-	// 	[articles, ressource.id],
-	// );
+	const { data: article, isLoading: isLoadingArticle } =
+		useGetArticleByRessource(id);
 
 	const [formData, setFormData] = useState<FormData>({
-		title: article?.title ?? "",
-		description: ressource.description ?? "",
-		status_id: ressource.status?.id ?? "",
-		confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
-		tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+		title: "",
+		description: "",
+		status_id: "",
+		confidentiality_type_id: "",
+		tags: "",
 		content: "",
 	});
 	const [initialized, setInitialized] = useState(false);
 	const [errors, setErrors] = useState<FormErrors>({});
 
-	if (!initialized && article) {
-		setFormData((prev) => ({ ...prev, content: article.content ?? "" }));
+	if (!initialized && ressource && article) {
+		setFormData({
+			title: ressource.title ?? "",
+			description: ressource.description ?? "",
+			status_id: ressource.status?.id ?? "",
+			confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
+			tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+			content: article.content ?? "",
+		});
 		setInitialized(true);
 	}
 
@@ -74,24 +77,26 @@ export default function EditionArticle(id: string) {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors({});
-		if (!validate() || !article) return;
+		if (!validate() || !article || !ressource) return;
 
 		updateArticle(
 			{
 				id: article.id,
 				params: {
-					title: formData.title || null,
-					description: formData.description || null,
-					status_id: formData.status_id,
-					confidentiality_type_id: formData.confidentiality_type_id,
-					type_id: ressource.type.id,
-					tags: formData.tags
-						? formData.tags
-								.split(",")
-								.map((t) => t.trim())
-								.filter(Boolean)
-						: null,
 					content: formData.content,
+					ressource: {
+						title: formData.title,
+						description: formData.description,
+						status_id: formData.status_id,
+						confidentiality_type_id: formData.confidentiality_type_id,
+						type_id: ressource.type.id,
+						tags: formData.tags
+							? formData.tags
+									.split(",")
+									.map((t) => t.trim())
+									.filter(Boolean)
+							: [],
+					},
 				},
 			},
 			{

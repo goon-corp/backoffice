@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { useUpdateRessource, useGetRessourceStatuses, useGetRessourceConfidentialityTypes } from "../hooks/useRessource";
+import { useGetRessource, useUpdateRessource, useGetRessourceStatuses, useGetRessourceConfidentialityTypes } from "../hooks/useRessource";
 import { useGetPolls } from "../hooks/usePoll";
 import { useGetPollOptions, useCreatePollOption, useUpdatePollOption, useDeletePollOption } from "../hooks/usePollOption";
-import type { ReturnRessourceDto, UpdateRessourceDto } from "../Types/RessourceTypes";
+import type { UpdateRessourceDto } from "../Types/RessourceTypes";
 import type { PollOptionInfoDto } from "../Types/PollOptionTypes";
 
 type FormData = {
@@ -16,14 +16,15 @@ type FormData = {
 
 type FormErrors = Partial<Record<keyof FormData | "general", string>>;
 
-export default function EditionPoll({ ressource }: { ressource: ReturnRessourceDto }) {
+export default function EditionPoll({ id }: { id: string }) {
 	const navigate = useNavigate();
+	const { data: ressource } = useGetRessource(id);
 	const { mutate: updateRessource, isPending: isPendingRessource } = useUpdateRessource();
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } = useGetRessourceConfidentialityTypes();
 
 	const { data: polls = [], isLoading: isLoadingPoll } = useGetPolls();
-	const poll = useMemo(() => polls.find((p) => p.ressource_id === ressource.id), [polls, ressource.id]);
+	const poll = useMemo(() => ressource ? polls.find((p) => p.ressource_id === ressource.id) : undefined, [polls, ressource]);
 
 	const { data: allOptions = [], isLoading: isLoadingOptions } = useGetPollOptions();
 	const options = useMemo(
@@ -36,13 +37,25 @@ export default function EditionPoll({ ressource }: { ressource: ReturnRessourceD
 	const { mutate: deleteOption } = useDeletePollOption();
 
 	const [formData, setFormData] = useState<FormData>({
-		title: ressource.title ?? "",
-		description: ressource.description ?? "",
-		status_id: ressource.status?.id ?? "",
-		confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
-		tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+		title: "",
+		description: "",
+		status_id: "",
+		confidentiality_type_id: "",
+		tags: "",
 	});
+	const [initialized, setInitialized] = useState(false);
 	const [errors, setErrors] = useState<FormErrors>({});
+
+	if (!initialized && ressource) {
+		setFormData({
+			title: ressource.title ?? "",
+			description: ressource.description ?? "",
+			status_id: ressource.status?.id ?? "",
+			confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
+			tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+		});
+		setInitialized(true);
+	}
 	const [newOption, setNewOption] = useState("");
 	const [editingOption, setEditingOption] = useState<{ id: string; value: string } | null>(null);
 
@@ -63,7 +76,7 @@ export default function EditionPoll({ ressource }: { ressource: ReturnRessourceD
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors({});
-		if (!validate()) return;
+		if (!validate() || !ressource) return;
 
 		const ressourcePayload: UpdateRessourceDto = {
 			title: formData.title || null,

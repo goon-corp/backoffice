@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { useUpdateRessource, useGetRessourceStatuses, useGetRessourceConfidentialityTypes } from "../hooks/useRessource";
+import { useGetRessource, useUpdateRessource, useGetRessourceStatuses, useGetRessourceConfidentialityTypes } from "../hooks/useRessource";
 import { useGetQuizzes } from "../hooks/useQuizz";
 import { useGetQuizzQuestions, useCreateQuizzQuestion, useUpdateQuizzQuestion, useDeleteQuizzQuestion } from "../hooks/useQuizzQuestion";
-import type { ReturnRessourceDto, UpdateRessourceDto } from "../Types/RessourceTypes";
+import type { UpdateRessourceDto } from "../Types/RessourceTypes";
 import type { QuizzQuestionInfoDto } from "../Types/QuizzQuestionTypes";
 
 type FormData = {
@@ -24,14 +24,15 @@ type NewQuestion = {
 
 const emptyQuestion: NewQuestion = { question: "", possible_answers: "", correct_answer: "" };
 
-export default function EditionQuizz({ ressource }: { ressource: ReturnRessourceDto }) {
+export default function EditionQuizz({ id }: { id: string }) {
 	const navigate = useNavigate();
+	const { data: ressource } = useGetRessource(id);
 	const { mutate: updateRessource, isPending: isPendingRessource } = useUpdateRessource();
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } = useGetRessourceConfidentialityTypes();
 
 	const { data: quizzes = [], isLoading: isLoadingQuizz } = useGetQuizzes();
-	const quizz = useMemo(() => quizzes.find((q) => q.ressource_id === ressource.id), [quizzes, ressource.id]);
+	const quizz = useMemo(() => ressource ? quizzes.find((q) => q.ressource_id === ressource.id) : undefined, [quizzes, ressource]);
 
 	const { data: allQuestions = [], isLoading: isLoadingQuestions } = useGetQuizzQuestions();
 	const questions = useMemo(
@@ -44,13 +45,25 @@ export default function EditionQuizz({ ressource }: { ressource: ReturnRessource
 	const { mutate: deleteQuestion } = useDeleteQuizzQuestion();
 
 	const [formData, setFormData] = useState<FormData>({
-		title: ressource.title ?? "",
-		description: ressource.description ?? "",
-		status_id: ressource.status?.id ?? "",
-		confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
-		tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+		title: "",
+		description: "",
+		status_id: "",
+		confidentiality_type_id: "",
+		tags: "",
 	});
+	const [initialized, setInitialized] = useState(false);
 	const [errors, setErrors] = useState<FormErrors>({});
+
+	if (!initialized && ressource) {
+		setFormData({
+			title: ressource.title ?? "",
+			description: ressource.description ?? "",
+			status_id: ressource.status?.id ?? "",
+			confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
+			tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+		});
+		setInitialized(true);
+	}
 	const [newQ, setNewQ] = useState<NewQuestion>(emptyQuestion);
 	const [editingQ, setEditingQ] = useState<{ id: string } & NewQuestion | null>(null);
 
@@ -71,7 +84,7 @@ export default function EditionQuizz({ ressource }: { ressource: ReturnRessource
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors({});
-		if (!validate()) return;
+		if (!validate() || !ressource) return;
 
 		const ressourcePayload: UpdateRessourceDto = {
 			title: formData.title || null,
