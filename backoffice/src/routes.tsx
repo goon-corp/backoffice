@@ -1,3 +1,9 @@
+import type { RouteObject } from "react-router";
+import App from "./App";
+import { authMiddleware } from "./Middleware/authMiddleware";
+import Login from "./Pages/Login";
+import HeaderLayout from "./Layout/HeaderLayout";
+
 export const routes: RouteObject[] = [
 	{
 		element: <HeaderLayout />,
@@ -32,11 +38,11 @@ export const routes: RouteObject[] = [
 				middleware: [authMiddleware],
 				element: <Login />,
 			},
-			{
-				path: "/register",
-				middleware: [authMiddleware],
-				element: <Register />,
-			},
+			// {
+			// 	path: "/register",
+			// 	middleware: [authMiddleware],
+			// 	element: <Register />,
+			// },
 			// {
 			// 	path: "user",
 			// 	middleware: [authMiddleware],
