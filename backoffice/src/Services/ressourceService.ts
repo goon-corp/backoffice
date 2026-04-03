@@ -15,6 +15,16 @@ export const ressourceService = {
     return response.data;
   },
 
+  getById: async (id: string): Promise<ReturnRessourceDto> => {
+    const response = await api.get(`/api/ressources/${id}`);
+    return response.data;
+  },
+
+  update: async (id: string, data: UpdateRessourceDto): Promise<ReturnRessourceDto> => {
+    const response = await api.put(`/api/ressources/${id}`, data);
+    return response.data;
+  },
+
   create: async (formData: FormData): Promise<ReturnRessourceDto> => {
     const response = await api.post("/api/ressources", formData, {
       headers: { "Content-Type": "multipart/form-data" },

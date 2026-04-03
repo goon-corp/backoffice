@@ -5,6 +5,10 @@ import Login from "./Pages/Login";
 import HeaderLayout from "./Layout/HeaderLayout";
 import GestionUser from "./Pages/GestionUser";
 import EditionUser from "./Pages/EditionUser";
+import AjoutUser from "./Pages/AjoutUser";
+import EditionResource from "./Pages/EditionResource";
+import AjoutResource from "./Pages/AjoutResource";
+import GestionResource from "./Pages/GestionResource";
 
 export const routes: RouteObject[] = [
 	{
@@ -20,11 +24,11 @@ export const routes: RouteObject[] = [
 				middleware: [authMiddleware],
 				element: <GestionUser />,
 			},
-			// {
-			// 	path: "/gestion-ressource",
-			// 	middleware: [authMiddleware],
-			// 	element: <GestionRessource />,
-			// },
+			{
+				path: "/gestion-ressource",
+				middleware: [authMiddleware],
+				element: <GestionResource />,
+			},
 			// {
 			// 	path: "/gestion-ressource-categorie",
 			// 	middleware: [authMiddleware],
@@ -49,24 +53,24 @@ export const routes: RouteObject[] = [
 				path: "user",
 				middleware: [authMiddleware],
 				children: [
-					// { path: "ajout-utilisateur", Component: AjoutUser },
+					{ path: "ajout-utilisateur", Component: AjoutUser },
 					{
 						path: "edition",
 						children: [{ path: ":id", Component: EditionUser }],
 					},
 				],
 			},
-			// {
-			// 	path: "ressource",
-			// 	middleware: [authMiddleware],
-			// 	children: [
-			// 		{ path: "ajout-ressource", Component: AjoutRessource },
-			// 		{
-			// 			path: "edition",
-			// 			children: [{ path: ":id", Component: EditionRessource }],
-			// 		},
-			// 	],
-			// },
+			{
+				path: "ressource",
+				middleware: [authMiddleware],
+				children: [
+					{ path: "ajout", Component: AjoutResource },
+					{
+						path: "edition",
+						children: [{ path: ":id", Component: EditionResource }],
+					},
+				],
+			},
 			// {
 			// 	path: "ressource-categorie",
 			// 	middleware: [authMiddleware],
