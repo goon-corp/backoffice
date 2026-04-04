@@ -9,6 +9,9 @@ import AjoutUser from "./Pages/AjoutUser";
 import EditionResource from "./Pages/EditionResource";
 import AjoutResource from "./Pages/AjoutResource";
 import GestionResource from "./Pages/GestionResource";
+import GestionCommentaire from "./Pages/GestionCommentaire";
+import AjoutCommentaire from "./Pages/AjoutCommentaire";
+import EditionCommentaire from "./Pages/EditionCommentaire";
 
 export const routes: RouteObject[] = [
 	{
@@ -29,11 +32,11 @@ export const routes: RouteObject[] = [
 				middleware: [authMiddleware],
 				element: <GestionResource />,
 			},
-			// {
-			// 	path: "/gestion-ressource-categorie",
-			// 	middleware: [authMiddleware],
-			// 	element: <GestionRessourceCat />,
-			// },
+			{
+				path: "/gestion-commentaire",
+				middleware: [authMiddleware],
+				element: <GestionCommentaire />,
+			},
 			// {
 			// 	path: "/gestion-emotion",
 			// 	middleware: [authMiddleware],
@@ -71,17 +74,17 @@ export const routes: RouteObject[] = [
 					},
 				],
 			},
-			// {
-			// 	path: "ressource-categorie",
-			// 	middleware: [authMiddleware],
-			// 	children: [
-			// 		{ path: "ajout", Component: AjoutRessourceCat },
-			// 		{
-			// 			path: "edition",
-			// 			children: [{ path: ":id", Component: EditionRessourceCat }],
-			// 		},
-			// 	],
-			// },
+			{
+				path: "commentaire",
+				middleware: [authMiddleware],
+				children: [
+					{ path: "ajout", Component: AjoutCommentaire },
+					{
+						path: "edition",
+						children: [{ path: ":id", Component: EditionCommentaire }],
+					},
+				],
+			},
 		],
 	},
 ];
