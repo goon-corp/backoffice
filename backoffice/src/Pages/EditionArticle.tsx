@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
-	useGetRessource,
 	useGetRessourceStatuses,
 	useGetRessourceConfidentialityTypes,
 } from "../hooks/useRessource";
@@ -9,13 +8,14 @@ import {
 	useGetArticleByRessource,
 	useUpdateArticle,
 } from "../hooks/useArticle";
+import { useGetTags } from "../hooks/useTag";
 
 type FormData = {
 	title: string;
 	description: string;
 	status_id: string;
 	confidentiality_type_id: string;
-	tags: string;
+	tags: string[];
 	content: string;
 };
 
@@ -23,20 +23,21 @@ type FormErrors = Partial<Record<keyof FormData | "general", string>>;
 
 export default function EditionArticle({ id }: { id: string }) {
 	const navigate = useNavigate();
-	const { data: ressource } = useGetRessource(id);
 	const { mutate: updateArticle, isPending } = useUpdateArticle();
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } =
 		useGetRessourceConfidentialityTypes();
+	const { data: allTags = [] } = useGetTags();
 	const { data: article, isLoading: isLoadingArticle } =
 		useGetArticleByRessource(id);
+	const ressource = article?.ressource;
 
 	const [formData, setFormData] = useState<FormData>({
 		title: "",
 		description: "",
 		status_id: "",
 		confidentiality_type_id: "",
-		tags: "",
+		tags: [],
 		content: "",
 	});
 	const [initialized, setInitialized] = useState(false);
@@ -48,7 +49,7 @@ export default function EditionArticle({ id }: { id: string }) {
 			description: ressource.description ?? "",
 			status_id: ressource.status?.id ?? "",
 			confidentiality_type_id: ressource.confidentiality_type?.id ?? "",
-			tags: ressource.tags?.map((t) => t.label ?? t.id).join(", ") ?? "",
+			tags: ressource.tags?.map((t: { id: string; label: string }) => t.id) ?? [],
 			content: article.content ?? "",
 		});
 		setInitialized(true);
@@ -90,12 +91,7 @@ export default function EditionArticle({ id }: { id: string }) {
 						status_id: formData.status_id,
 						confidentiality_type_id: formData.confidentiality_type_id,
 						type_id: ressource.type.id,
-						tags: formData.tags
-							? formData.tags
-									.split(",")
-									.map((t) => t.trim())
-									.filter(Boolean)
-							: [],
+						tags: formData.tags,
 					},
 				},
 			},
@@ -235,18 +231,53 @@ export default function EditionArticle({ id }: { id: string }) {
 						<label htmlFor="tags" className="text-sm font-medium text-gray-700">
 							Tags
 						</label>
-						<input
-							type="text"
+						<select
 							id="tags"
-							name="tags"
-							value={formData.tags}
-							onChange={handleChange}
-							placeholder="tag1, tag2, tag3"
-							className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-						/>
-						<span className="text-xs text-gray-400">
-							Séparés par des virgules
-						</span>
+							className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition bg-white"
+							value=""
+							onChange={(e) => {
+								const tagId = e.target.value;
+								if (tagId && !formData.tags.includes(tagId)) {
+									setFormData((prev) => ({ ...prev, tags: [...prev.tags, tagId] }));
+								}
+							}}
+						>
+							<option value="">Ajouter un tag…</option>
+							{allTags
+								.filter((t) => !formData.tags.includes(t.id))
+								.map((t) => (
+									<option key={t.id} value={t.id}>
+										{t.label ?? t.id}
+									</option>
+								))}
+						</select>
+						{formData.tags.length > 0 && (
+							<div className="flex flex-wrap gap-1.5 mt-1">
+								{formData.tags.map((tagId) => {
+									const tag = allTags.find((t) => t.id === tagId);
+									return (
+										<span
+											key={tagId}
+											className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs"
+										>
+											{tag?.label ?? tagId}
+											<button
+												type="button"
+												onClick={() =>
+													setFormData((prev) => ({
+														...prev,
+														tags: prev.tags.filter((id) => id !== tagId),
+													}))
+												}
+												className="hover:text-red-500 transition"
+											>
+												&times;
+											</button>
+										</span>
+									);
+								})}
+							</div>
+						)}
 					</div>
 
 					<hr className="border-gray-200" />
