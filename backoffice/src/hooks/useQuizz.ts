@@ -1,6 +1,14 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { quizzService } from "../Services/quizzService";
-import type { CreateQuizzDto, UpdateQuizzDto, QuizzInfoDto } from "../Types/QuizzTypes";
+import type { UpdateQuizzDto, QuizzInfoDto } from "../Types/QuizzTypes";
+
+export const useGetQuizzByRessource = (ressourceId: string, options?: UseQueryOptions<QuizzInfoDto, Error>) => {
+	return useQuery({
+		queryKey: ["quizzes", "byRessource", ressourceId],
+		queryFn: () => quizzService.getByRessource(ressourceId),
+		...options,
+	});
+};
 
 export const useGetQuizzes = (options?: UseQueryOptions<QuizzInfoDto[], Error>) => {
 	return useQuery({
@@ -18,9 +26,9 @@ export const useGetQuizz = (id: string, options?: UseQueryOptions<QuizzInfoDto, 
 	});
 };
 
-export const useCreateQuizz = (options?: UseMutationOptions<QuizzInfoDto, Error, CreateQuizzDto>) => {
+export const useCreateQuizz = (options?: UseMutationOptions<QuizzInfoDto, Error, FormData>) => {
 	return useMutation({
-		mutationFn: (params: CreateQuizzDto) => quizzService.create(params),
+		mutationFn: (formData: FormData) => quizzService.create(formData),
 		...options,
 	});
 };

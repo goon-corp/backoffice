@@ -1,7 +1,6 @@
 import { api } from "../lib/axios";
 import type {
 	Article,
-	CreateArticleDto,
 	UpdateArticleDto,
 } from "../Types/ArticleTypes";
 
@@ -21,8 +20,10 @@ export const articleService = {
 		return response.data;
 	},
 
-	create: async (params: CreateArticleDto): Promise<Article> => {
-		const response = await api.post("/api/articles", params);
+	create: async (formData: FormData): Promise<Article> => {
+		const response = await api.post("/api/articles", formData, {
+			headers: { "Content-Type": "multipart/form-data" },
+		});
 		return response.data;
 	},
 

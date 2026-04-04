@@ -1,5 +1,5 @@
 import { api } from "../lib/axios";
-import type { CreatePollDto, UpdatePollDto, CreatePollOptionDto, PollInfoDto } from "../Types/PollTypes";
+import type { UpdatePollDto, CreatePollOptionDto, PollInfoDto } from "../Types/PollTypes";
 
 export const pollService = {
   getAll: async (): Promise<PollInfoDto[]> => {
@@ -12,8 +12,15 @@ export const pollService = {
     return response.data;
   },
 
-  create: async (params: CreatePollDto): Promise<PollInfoDto> => {
-    const response = await api.post("/api/polls", params);
+  getByRessource: async (ressourceId: string): Promise<PollInfoDto> => {
+    const response = await api.get(`/api/polls/${ressourceId}`);
+    return response.data;
+  },
+
+  create: async (formData: FormData): Promise<PollInfoDto> => {
+    const response = await api.post("/api/polls", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data;
   },
 

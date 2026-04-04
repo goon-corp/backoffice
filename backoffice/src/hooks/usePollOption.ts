@@ -1,4 +1,4 @@
-import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { pollOptionService } from "../Services/pollOptionService";
 import type { CreatePollOptionDto, UpdatePollOptionDto, PollOptionInfoDto } from "../Types/PollOptionTypes";
 
@@ -19,22 +19,37 @@ export const useGetPollOption = (id: string, options?: UseQueryOptions<PollOptio
 };
 
 export const useCreatePollOption = (options?: UseMutationOptions<PollOptionInfoDto, Error, CreatePollOptionDto>) => {
+	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (params: CreatePollOptionDto) => pollOptionService.create(params),
 		...options,
+		mutationFn: (params: CreatePollOptionDto) => pollOptionService.create(params),
+		onSuccess: (...args) => {
+			queryClient.invalidateQueries({ queryKey: ["poll-options"] });
+			options?.onSuccess?.(...args);
+		},
 	});
 };
 
 export const useUpdatePollOption = (options?: UseMutationOptions<PollOptionInfoDto, Error, { id: string; params: UpdatePollOptionDto }>) => {
+	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({ id, params }) => pollOptionService.update(id, params),
 		...options,
+		mutationFn: ({ id, params }) => pollOptionService.update(id, params),
+		onSuccess: (...args) => {
+			queryClient.invalidateQueries({ queryKey: ["poll-options"] });
+			options?.onSuccess?.(...args);
+		},
 	});
 };
 
 export const useDeletePollOption = (options?: UseMutationOptions<void, Error, string>) => {
+	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (id: string) => pollOptionService.delete(id),
 		...options,
+		mutationFn: (id: string) => pollOptionService.delete(id),
+		onSuccess: (...args) => {
+			queryClient.invalidateQueries({ queryKey: ["poll-options"] });
+			options?.onSuccess?.(...args);
+		},
 	});
 };

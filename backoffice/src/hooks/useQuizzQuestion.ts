@@ -1,4 +1,4 @@
-import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { quizzQuestionService } from "../Services/quizzQuestionService";
 import type { CreateQuizzQuestionDto, UpdateQuizzQuestionDto, CreateQuestionAnswerDto, QuizzQuestionInfoDto, QuestionAnswerInfoDto } from "../Types/QuizzQuestionTypes";
 
@@ -27,23 +27,38 @@ export const useGetQuestionAnswer = (userId: string, quizzQuestionId: string, op
 };
 
 export const useCreateQuizzQuestion = (options?: UseMutationOptions<QuizzQuestionInfoDto, Error, CreateQuizzQuestionDto>) => {
+	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (params: CreateQuizzQuestionDto) => quizzQuestionService.create(params),
 		...options,
+		mutationFn: (params: CreateQuizzQuestionDto) => quizzQuestionService.create(params),
+		onSuccess: (...args) => {
+			queryClient.invalidateQueries({ queryKey: ["quizz-questions"] });
+			options?.onSuccess?.(...args);
+		},
 	});
 };
 
 export const useUpdateQuizzQuestion = (options?: UseMutationOptions<QuizzQuestionInfoDto, Error, { id: string; params: UpdateQuizzQuestionDto }>) => {
+	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({ id, params }) => quizzQuestionService.update(id, params),
 		...options,
+		mutationFn: ({ id, params }) => quizzQuestionService.update(id, params),
+		onSuccess: (...args) => {
+			queryClient.invalidateQueries({ queryKey: ["quizz-questions"] });
+			options?.onSuccess?.(...args);
+		},
 	});
 };
 
 export const useDeleteQuizzQuestion = (options?: UseMutationOptions<void, Error, string>) => {
+	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (id: string) => quizzQuestionService.delete(id),
 		...options,
+		mutationFn: (id: string) => quizzQuestionService.delete(id),
+		onSuccess: (...args) => {
+			queryClient.invalidateQueries({ queryKey: ["quizz-questions"] });
+			options?.onSuccess?.(...args);
+		},
 	});
 };
 

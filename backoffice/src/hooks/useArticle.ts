@@ -1,6 +1,6 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { articleService } from "../Services/articleService";
-import type { Article, CreateArticleDto, UpdateArticleDto } from "../Types/ArticleTypes";
+import type { Article, UpdateArticleDto } from "../Types/ArticleTypes";
 
 export const useGetArticles = (options?: UseQueryOptions<Article[], Error>) => {
 	return useQuery({
@@ -26,9 +26,9 @@ export const useGetArticleByRessource = (ressourceId: string, options?: UseQuery
 	});
 };
 
-export const useCreateArticle = (options?: UseMutationOptions<Article, Error, CreateArticleDto>) => {
+export const useCreateArticle = (options?: UseMutationOptions<Article, Error, FormData>) => {
 	return useMutation({
-		mutationFn: (params: CreateArticleDto) => articleService.create(params),
+		mutationFn: (formData: FormData) => articleService.create(formData),
 		...options,
 	});
 };
