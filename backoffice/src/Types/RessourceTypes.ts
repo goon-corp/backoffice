@@ -41,7 +41,9 @@ export type ReturnRessourceDto = {
 export type GetRessourcesParams = {
   page?: number;
   size?: number;
-  search?: string;
+  IsDeleted?: boolean;
+  RessourceTitle?: string;
+  RessourceType?: string;
 };
 
 export type RessourceMedia = {

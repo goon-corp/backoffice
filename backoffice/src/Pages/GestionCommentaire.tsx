@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useGetComments, useDeleteComment } from "../hooks/useComment";
 import { useGetUser } from "../hooks/useUser";
@@ -41,13 +40,9 @@ function RessourceTitle({ id }: { id: string }) {
 export default function GestionCommentaire() {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
-	const [search, setSearch] = useState("");
+	// const [search, setSearch] = useState("");
 
-	const {
-		data: comments = [],
-		isLoading,
-		isError,
-	} = useGetComments();
+	const { data: comments = [], isLoading, isError } = useGetComments();
 
 	const { mutate: deleteComment } = useDeleteComment({
 		onSuccess: () => {
@@ -55,11 +50,11 @@ export default function GestionCommentaire() {
 		},
 	});
 
-	const filtered = search
-		? comments.filter((c) =>
-				c.content?.toLowerCase().includes(search.toLowerCase()),
-			)
-		: comments;
+	// const filtered = search
+	// 	? comments.filter((c) =>
+	// 			c.content?.toLowerCase().includes(search.toLowerCase()),
+	// 		)
+	// 	: comments;
 
 	if (isLoading) {
 		return (
@@ -83,7 +78,7 @@ export default function GestionCommentaire() {
 				<div>
 					<h2 className="text-xl font-semibold text-gray-800">Commentaires</h2>
 					<p className="text-sm text-gray-400">
-						{filtered.length} commentaire{filtered.length !== 1 ? "s" : ""}
+						{comments.length} commentaire{comments.length !== 1 ? "s" : ""}
 					</p>
 				</div>
 				<button
@@ -94,7 +89,7 @@ export default function GestionCommentaire() {
 					Ajouter un commentaire
 				</button>
 			</div>
-
+			{/* 
 			<div>
 				<input
 					type="text"
@@ -103,7 +98,7 @@ export default function GestionCommentaire() {
 					onChange={(e) => setSearch(e.target.value)}
 					className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition w-72"
 				/>
-			</div>
+			</div> */}
 
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 				<div className="grid grid-cols-6 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wide">
@@ -112,12 +107,12 @@ export default function GestionCommentaire() {
 					))}
 				</div>
 
-				{filtered.length === 0 ? (
+				{comments.length === 0 ? (
 					<div className="py-16 text-center text-sm text-gray-400">
 						Aucun commentaire trouvé.
 					</div>
 				) : (
-					filtered.map((comment: Comment) => (
+					comments.map((comment: Comment) => (
 						<div
 							key={comment.id}
 							className="grid grid-cols-6 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50 transition"
@@ -132,9 +127,7 @@ export default function GestionCommentaire() {
 							</span>
 							<div>
 								<button
-									onClick={() =>
-										navigate(`/commentaire/edition/${comment.id}`)
-									}
+									onClick={() => navigate(`/commentaire/edition/${comment.id}`)}
 									className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
 									title="Éditer"
 								>

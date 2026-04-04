@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useGetReports, useDeleteReport } from "../hooks/useReport";
 import { useGetReportTypes } from "../hooks/useReportType";
@@ -45,22 +44,16 @@ function ReportTypeName({ id }: { id: string }) {
 	const rt = reportTypes.find((t) => t.id === id);
 	if (!rt) return <span className="text-sm text-gray-400">—</span>;
 	return (
-		<span className="text-sm text-gray-500 truncate">
-			{rt.label || rt.id}
-		</span>
+		<span className="text-sm text-gray-500 truncate">{rt.label || rt.id}</span>
 	);
 }
 
 export default function GestionReport() {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
-	const [search, setSearch] = useState("");
+	// const [search, setSearch] = useState("");
 
-	const {
-		data: reports = [],
-		isLoading,
-		isError,
-	} = useGetReports();
+	const { data: reports = [], isLoading, isError } = useGetReports();
 
 	const { mutate: deleteReport } = useDeleteReport({
 		onSuccess: () => {
@@ -68,12 +61,12 @@ export default function GestionReport() {
 		},
 	});
 
-	const filtered = search
-		? reports.filter((r) =>
-				r.id.toLowerCase().includes(search.toLowerCase()) ||
-				r.ressource_id.toLowerCase().includes(search.toLowerCase()),
-			)
-		: reports;
+	// const filtered = search
+	// 	? reports.filter((r) =>
+	// 			r.id.toLowerCase().includes(search.toLowerCase()) ||
+	// 			r.ressource_id.toLowerCase().includes(search.toLowerCase()),
+	// 		)
+	// 	: reports;
 
 	if (isLoading) {
 		return (
@@ -97,7 +90,7 @@ export default function GestionReport() {
 				<div>
 					<h2 className="text-xl font-semibold text-gray-800">Reports</h2>
 					<p className="text-sm text-gray-400">
-						{filtered.length} report{filtered.length !== 1 ? "s" : ""}
+						{reports.length} report{reports.length !== 1 ? "s" : ""}
 					</p>
 				</div>
 				<button
@@ -109,7 +102,7 @@ export default function GestionReport() {
 				</button>
 			</div>
 
-			<div>
+			{/* <div>
 				<input
 					type="text"
 					placeholder="Rechercher un report…"
@@ -117,7 +110,7 @@ export default function GestionReport() {
 					onChange={(e) => setSearch(e.target.value)}
 					className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition w-72"
 				/>
-			</div>
+			</div> */}
 
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 				<div className="grid grid-cols-7 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wide">
@@ -126,12 +119,12 @@ export default function GestionReport() {
 					))}
 				</div>
 
-				{filtered.length === 0 ? (
+				{reports.length === 0 ? (
 					<div className="py-16 text-center text-sm text-gray-400">
 						Aucun report trouvé.
 					</div>
 				) : (
-					filtered.map((report: ReportInfoDto) => (
+					reports.map((report: ReportInfoDto) => (
 						<div
 							key={report.id}
 							className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50 transition"
@@ -155,9 +148,7 @@ export default function GestionReport() {
 							</span>
 							<div>
 								<button
-									onClick={() =>
-										navigate(`/report/edition/${report.id}`)
-									}
+									onClick={() => navigate(`/report/edition/${report.id}`)}
 									className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
 									title="Éditer"
 								>
