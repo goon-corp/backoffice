@@ -2,6 +2,14 @@ import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } 
 import { quizzService } from "../Services/quizzService";
 import type { CreateQuizzDto, UpdateQuizzDto, QuizzInfoDto } from "../Types/QuizzTypes";
 
+export const useGetQuizzByRessource = (ressourceId: string, options?: UseQueryOptions<QuizzInfoDto, Error>) => {
+	return useQuery({
+		queryKey: ["quizzes", "byRessource", ressourceId],
+		queryFn: () => quizzService.getByRessource(ressourceId),
+		...options,
+	});
+};
+
 export const useGetQuizzes = (options?: UseQueryOptions<QuizzInfoDto[], Error>) => {
 	return useQuery({
 		queryKey: ["quizzes"],

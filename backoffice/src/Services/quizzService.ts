@@ -12,6 +12,11 @@ export const quizzService = {
     return response.data;
   },
 
+  getByRessource: async (ressourceId: string): Promise<QuizzInfoDto> => {
+    const response = await api.get(`/api/quizzes/${ressourceId}`);
+    return response.data;
+  },
+
   create: async (params: CreateQuizzDto): Promise<QuizzInfoDto> => {
     const response = await api.post("/api/quizzes", params);
     return response.data;
