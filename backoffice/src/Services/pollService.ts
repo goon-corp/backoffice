@@ -12,6 +12,11 @@ export const pollService = {
     return response.data;
   },
 
+  getByRessource: async (ressourceId: string): Promise<PollInfoDto> => {
+    const response = await api.get(`/api/polls/${ressourceId}`);
+    return response.data;
+  },
+
   create: async (params: CreatePollDto): Promise<PollInfoDto> => {
     const response = await api.post("/api/polls", params);
     return response.data;
