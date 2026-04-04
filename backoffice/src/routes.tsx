@@ -12,6 +12,9 @@ import GestionResource from "./Pages/GestionResource";
 import GestionCommentaire from "./Pages/GestionCommentaire";
 import AjoutCommentaire from "./Pages/AjoutCommentaire";
 import EditionCommentaire from "./Pages/EditionCommentaire";
+import GestionReport from "./Pages/GestionReport";
+import AjoutReport from "./Pages/AjoutReport";
+import EditionReport from "./Pages/EditionReport";
 
 export const routes: RouteObject[] = [
 	{
@@ -37,11 +40,11 @@ export const routes: RouteObject[] = [
 				middleware: [authMiddleware],
 				element: <GestionCommentaire />,
 			},
-			// {
-			// 	path: "/gestion-emotion",
-			// 	middleware: [authMiddleware],
-			// 	element: <GestionEmotion />,
-			// },
+			{
+				path: "/gestion-report",
+				middleware: [authMiddleware],
+				element: <GestionReport />,
+			},
 			{
 				path: "/login",
 				middleware: [authMiddleware],
@@ -71,6 +74,17 @@ export const routes: RouteObject[] = [
 					{
 						path: "edition",
 						children: [{ path: ":id", Component: EditionResource }],
+					},
+				],
+			},
+			{
+				path: "report",
+				middleware: [authMiddleware],
+				children: [
+					{ path: "ajout", Component: AjoutReport },
+					{
+						path: "edition",
+						children: [{ path: ":id", Component: EditionReport }],
 					},
 				],
 			},
