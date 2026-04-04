@@ -1,8 +1,8 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { userService } from "../Services/userService";
-import type { User, CreateUserDto, UpdateUserDto } from "../Types/UserTypes";
+import type { User, UserInfoDto, UserProfileDto, CreateUserDto, UpdateUserDto } from "../Types/UserTypes";
 
-export const useGetUsers = (options?: UseQueryOptions<User[], Error>) => {
+export const useGetUsers = (options?: UseQueryOptions<UserInfoDto[], Error>) => {
 	return useQuery({
 		queryKey: ["users"],
 		queryFn: () => userService.getAll(),
@@ -18,7 +18,7 @@ export const useGetUser = (id: string, options?: UseQueryOptions<User, Error>) =
 	});
 };
 
-export const useGetUserProfile = (id: string, options?: UseQueryOptions<User, Error>) => {
+export const useGetUserProfile = (id: string, options?: UseQueryOptions<UserProfileDto, Error>) => {
 	return useQuery({
 		queryKey: ["users", id, "profile"],
 		queryFn: () => userService.getProfile(id),
@@ -26,14 +26,22 @@ export const useGetUserProfile = (id: string, options?: UseQueryOptions<User, Er
 	});
 };
 
-export const useCreateUser = (options?: UseMutationOptions<User, Error, CreateUserDto>) => {
+export const useGetMe = (options?: UseQueryOptions<UserInfoDto, Error>) => {
+	return useQuery({
+		queryKey: ["users", "me"],
+		queryFn: () => userService.getMe(),
+		...options,
+	});
+};
+
+export const useCreateUser = (options?: UseMutationOptions<UserInfoDto, Error, CreateUserDto>) => {
 	return useMutation({
 		mutationFn: (params: CreateUserDto) => userService.create(params),
 		...options,
 	});
 };
 
-export const useUpdateUser = (options?: UseMutationOptions<User, Error, { id: string; params: UpdateUserDto }>) => {
+export const useUpdateUser = (options?: UseMutationOptions<UserInfoDto, Error, { id: string; params: UpdateUserDto }>) => {
 	return useMutation({
 		mutationFn: ({ id, params }) => userService.update(id, params),
 		...options,

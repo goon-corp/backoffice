@@ -1,30 +1,35 @@
 import { api } from "../lib/axios";
-import type { User, CreateUserDto, UpdateUserDto } from "../Types/UserTypes";
+import type { User, UserInfoDto, UserProfileDto, CreateUserDto, UpdateUserDto } from "../Types/UserTypes";
 
 export const userService = {
-  getAll: async (): Promise<User[]> => {
+  getAll: async (): Promise<UserInfoDto[]> => {
     const response = await api.get("/api/user");
     return response.data;
   },
 
   getById: async (id: string): Promise<User> => {
     const response = await api.get(`/api/user/${id}`);
-    return response.data;
+    return response.data.data;
   },
 
-  getProfile: async (id: string): Promise<User> => {
-    const response = await api.get(`/api/user/profile/${id}`);
-    return response.data;
+  getProfile: async (id: string): Promise<UserProfileDto> => {
+    const response = await api.get(`/api/user/${id}/profile`);
+    return response.data.data;
   },
 
-  create: async (params: CreateUserDto): Promise<User> => {
+  getMe: async (): Promise<UserInfoDto> => {
+    const response = await api.get("/api/user/me");
+    return response.data.data;
+  },
+
+  create: async (params: CreateUserDto): Promise<UserInfoDto> => {
     const response = await api.post("/api/user", params);
-    return response.data;
+    return response.data.data;
   },
 
-  update: async (id: string, params: UpdateUserDto): Promise<User> => {
+  update: async (id: string, params: UpdateUserDto): Promise<UserInfoDto> => {
     const response = await api.put(`/api/user/${id}`, params);
-    return response.data;
+    return response.data.data;
   },
 
   delete: async (id: string): Promise<void> => {

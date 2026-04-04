@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useGetUsers, useDeleteUser } from "../hooks/useUser";
-import type { User } from "../Types/UserTypes";
+import type { UserInfoDto } from "../Types/UserTypes";
 
 const columns = [
 	"Nom",
@@ -68,7 +68,7 @@ export default function GestionUser() {
 						Aucun utilisateur trouvé.
 					</div>
 				) : (
-					users.map((user: User) => (
+					users.map((user: UserInfoDto) => (
 						<div
 							key={user.id}
 							className="grid grid-cols-7 gap-4 px-6 py-4 border-b border-gray-100 last:border-0 items-center hover:bg-gray-50 transition"
