@@ -18,6 +18,14 @@ export const useGetArticle = (id: string, options?: UseQueryOptions<Article, Err
 	});
 };
 
+export const useGetArticleByRessource = (ressourceId: string, options?: UseQueryOptions<Article, Error>) => {
+	return useQuery({
+		queryKey: ["articles", "byRessource", ressourceId],
+		queryFn: () => articleService.getByRessource(ressourceId),
+		...options,
+	});
+};
+
 export const useCreateArticle = (options?: UseMutationOptions<Article, Error, CreateArticleDto>) => {
 	return useMutation({
 		mutationFn: (params: CreateArticleDto) => articleService.create(params),

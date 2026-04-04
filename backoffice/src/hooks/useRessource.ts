@@ -1,11 +1,26 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { ressourceService } from "../Services/ressourceService";
-import type { ReturnRessourceDto, RessourceStatusInfoDto, RessourceConfidentialityTypeInfoDto, RessourceTypeInfoDto, RessourceMedia, GetRessourcesParams } from "../Types/RessourceTypes";
+import type { ReturnRessourceDto, UpdateRessourceDto, RessourceStatusInfoDto, RessourceConfidentialityTypeInfoDto, RessourceTypeInfoDto, RessourceMedia, GetRessourcesParams } from "../Types/RessourceTypes";
 
 export const useGetRessources = (params?: GetRessourcesParams, options?: UseQueryOptions<ReturnRessourceDto[], Error>) => {
 	return useQuery({
 		queryKey: ["ressources", params],
 		queryFn: () => ressourceService.getAll(params),
+		...options,
+	});
+};
+
+export const useGetRessource = (id: string, options?: UseQueryOptions<ReturnRessourceDto, Error>) => {
+	return useQuery({
+		queryKey: ["ressources", id],
+		queryFn: () => ressourceService.getById(id),
+		...options,
+	});
+};
+
+export const useUpdateRessource = (options?: UseMutationOptions<ReturnRessourceDto, Error, { id: string; params: UpdateRessourceDto }>) => {
+	return useMutation({
+		mutationFn: ({ id, params }) => ressourceService.update(id, params),
 		...options,
 	});
 };
