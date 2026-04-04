@@ -1,6 +1,6 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { pollService } from "../Services/pollService";
-import type { CreatePollDto, UpdatePollDto, CreatePollOptionDto, PollInfoDto } from "../Types/PollTypes";
+import type { UpdatePollDto, CreatePollOptionDto, PollInfoDto } from "../Types/PollTypes";
 
 export const useGetPolls = (options?: UseQueryOptions<PollInfoDto[], Error>) => {
 	return useQuery({
@@ -26,9 +26,9 @@ export const useGetPollByRessource = (ressourceId: string, options?: UseQueryOpt
 	});
 };
 
-export const useCreatePoll = (options?: UseMutationOptions<PollInfoDto, Error, CreatePollDto>) => {
+export const useCreatePoll = (options?: UseMutationOptions<PollInfoDto, Error, FormData>) => {
 	return useMutation({
-		mutationFn: (params: CreatePollDto) => pollService.create(params),
+		mutationFn: (formData: FormData) => pollService.create(formData),
 		...options,
 	});
 };

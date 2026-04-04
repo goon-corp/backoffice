@@ -1,5 +1,5 @@
 import { api } from "../lib/axios";
-import type { CreateQuizzDto, UpdateQuizzDto, QuizzInfoDto } from "../Types/QuizzTypes";
+import type { UpdateQuizzDto, QuizzInfoDto } from "../Types/QuizzTypes";
 
 export const quizzService = {
   getAll: async (): Promise<QuizzInfoDto[]> => {
@@ -17,8 +17,10 @@ export const quizzService = {
     return response.data;
   },
 
-  create: async (params: CreateQuizzDto): Promise<QuizzInfoDto> => {
-    const response = await api.post("/api/quizzes", params);
+  create: async (formData: FormData): Promise<QuizzInfoDto> => {
+    const response = await api.post("/api/quizzes", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data;
   },
 
