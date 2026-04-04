@@ -18,7 +18,8 @@ const HeaderLayout = () => {
 	const isLoginPage = location.pathname === "/login";
 
 	const handleLogout = () => {
-		document.cookie = "sessionToken=; Expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; SameSite=Strict";
+		document.cookie =
+			"sessionToken=; Expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; SameSite=Strict";
 		clearUserConnected();
 		navigate("/login");
 	};
@@ -60,7 +61,7 @@ const HeaderLayout = () => {
 				{user && (
 					<div className="px-3 py-4 border-t border-gray-200">
 						<div className="flex items-center gap-3 px-3 py-2 mb-1">
-							<div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+							<div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
 								<span className="text-blue-700 text-xs font-semibold uppercase">
 									{user.first_name?.[0] ?? "A"}
 								</span>
@@ -69,7 +70,9 @@ const HeaderLayout = () => {
 								<p className="text-sm font-medium text-gray-800 truncate">
 									{user.first_name} {user.last_name}
 								</p>
-								<p className="text-xs text-gray-400 truncate">{user.user_name}</p>
+								<p className="text-xs text-gray-400 truncate">
+									{user.user_name}
+								</p>
 							</div>
 						</div>
 						<button
@@ -86,7 +89,8 @@ const HeaderLayout = () => {
 			<div className="flex-1 flex flex-col min-w-0">
 				<header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
 					<h1 className="text-lg font-semibold text-gray-800">
-						{navLinks.find((l) => l.to === location.pathname)?.label ?? "Backoffice"}
+						{navLinks.find((l) => l.to === location.pathname)?.label ??
+							"Backoffice"}
 					</h1>
 					<span className="text-xs text-gray-400">
 						{new Date().toLocaleDateString("fr-FR", { dateStyle: "long" })}
