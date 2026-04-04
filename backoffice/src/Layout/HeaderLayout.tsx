@@ -5,8 +5,8 @@ const navLinks = [
 	{ to: "/", label: "Dashboard", icon: "⊞" },
 	{ to: "/gestion-user", label: "Utilisateurs", icon: "👤" },
 	{ to: "/gestion-ressource", label: "Ressources", icon: "📄" },
-	{ to: "/gestion-ressource-categorie", label: "Catégories", icon: "🏷️" },
-	{ to: "/gestion-emotion", label: "Émotions", icon: "💬" },
+	{ to: "/gestion-commentaire", label: "Commentaires", icon: "💬" },
+	// { to: "/gestion-emotion", label: "Émotions", icon: "💬" },
 ];
 
 const HeaderLayout = () => {
