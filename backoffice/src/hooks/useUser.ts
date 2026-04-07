@@ -1,8 +1,9 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { userService } from "../Services/userService";
 import type { User, UserInfoDto, UserProfileDto, CreateUserDto, UpdateUserDto } from "../Types/UserTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
-export const useGetUsers = (options?: UseQueryOptions<UserInfoDto[], Error>) => {
+export const useGetUsers = (options?: UseQueryOptions<PaginatedResponse<UserInfoDto>, Error>) => {
 	return useQuery({
 		queryKey: ["users"],
 		queryFn: () => userService.getAll(),

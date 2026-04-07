@@ -1,8 +1,9 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { reportService } from "../Services/reportService";
 import type { CreateReportDto, UpdateReportDto, ReportInfoDto } from "../Types/ReportTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
-export const useGetReports = (options?: UseQueryOptions<ReportInfoDto[], Error>) => {
+export const useGetReports = (options?: UseQueryOptions<PaginatedResponse<ReportInfoDto>, Error>) => {
 	return useQuery({
 		queryKey: ["reports"],
 		queryFn: () => reportService.getAll(),

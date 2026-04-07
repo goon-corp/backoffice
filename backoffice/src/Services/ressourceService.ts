@@ -8,9 +8,10 @@ import type {
   GetRessourcesParams,
   RessourceMedia,
 } from "../Types/RessourceTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
 export const ressourceService = {
-  getAll: async (params?: GetRessourcesParams): Promise<ReturnRessourceDto[]> => {
+  getAll: async (params?: GetRessourcesParams): Promise<PaginatedResponse<ReturnRessourceDto>> => {
     const response = await api.get("/api/ressources", { params });
     return response.data;
   },

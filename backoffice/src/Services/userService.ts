@@ -1,8 +1,9 @@
 import { api } from "../lib/axios";
 import type { User, UserInfoDto, UserProfileDto, CreateUserDto, UpdateUserDto } from "../Types/UserTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
 export const userService = {
-  getAll: async (): Promise<UserInfoDto[]> => {
+  getAll: async (): Promise<PaginatedResponse<UserInfoDto>> => {
     const response = await api.get("/api/user");
     return response.data;
   },

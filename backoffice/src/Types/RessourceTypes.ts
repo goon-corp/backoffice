@@ -36,6 +36,8 @@ export type ReturnRessourceDto = {
   confidentiality_type: RessourceConfidentialityTypeInfoDto;
   type: RessourceTypeInfoDto;
   tags: ReturnTagDto[] | null;
+  like_count: number;
+  favorite_count: number;
 };
 
 export type GetRessourcesParams = {

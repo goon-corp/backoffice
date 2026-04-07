@@ -53,7 +53,8 @@ export default function GestionReport() {
 	const queryClient = useQueryClient();
 	// const [search, setSearch] = useState("");
 
-	const { data: reports = [], isLoading, isError } = useGetReports();
+	const { data, isLoading, isError } = useGetReports();
+	const reports = data?.items ?? [];
 
 	const { mutate: deleteReport } = useDeleteReport({
 		onSuccess: () => {

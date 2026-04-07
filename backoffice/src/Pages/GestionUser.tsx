@@ -15,7 +15,8 @@ const columns = [
 
 export default function GestionUser() {
 	const navigate = useNavigate();
-	const { data: users = [], isLoading, isError } = useGetUsers();
+	const { data, isLoading, isError } = useGetUsers();
+	const users = data?.items ?? [];
 	const [confirmId, setConfirmId] = useState<string | null>(null);
 
 	const { mutate: deleteUser } = useDeleteUser({

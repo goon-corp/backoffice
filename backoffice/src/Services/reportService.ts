@@ -1,8 +1,9 @@
 import { api } from "../lib/axios";
 import type { CreateReportDto, UpdateReportDto, ReportInfoDto } from "../Types/ReportTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
 export const reportService = {
-  getAll: async (): Promise<ReportInfoDto[]> => {
+  getAll: async (): Promise<PaginatedResponse<ReportInfoDto>> => {
     const response = await api.get("/api/Report");
     return response.data;
   },

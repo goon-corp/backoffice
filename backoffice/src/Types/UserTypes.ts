@@ -50,3 +50,4 @@ export type UpdateUserDto = {
   deletion_time?: string | null;
   user_role_id?: string;
 };
+

@@ -1,8 +1,9 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { ressourceService } from "../Services/ressourceService";
 import type { ReturnRessourceDto, UpdateRessourceDto, RessourceStatusInfoDto, RessourceConfidentialityTypeInfoDto, RessourceTypeInfoDto, RessourceMedia, GetRessourcesParams } from "../Types/RessourceTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
-export const useGetRessources = (params?: GetRessourcesParams, options?: UseQueryOptions<ReturnRessourceDto[], Error>) => {
+export const useGetRessources = (params?: GetRessourcesParams, options?: UseQueryOptions<PaginatedResponse<ReturnRessourceDto>, Error>) => {
 	return useQuery({
 		queryKey: ["ressources", params],
 		queryFn: () => ressourceService.getAll(params),

@@ -27,10 +27,11 @@ export default function GestionResource() {
 	};
 
 	const {
-		data: ressources = [],
+		data,
 		isLoading,
 		isError,
 	} = useGetRessources(params);
+	const ressources = data?.items ?? [];
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center h-64 text-gray-400 text-sm">
