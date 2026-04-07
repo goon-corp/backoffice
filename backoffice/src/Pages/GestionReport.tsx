@@ -79,7 +79,7 @@ export default function GestionReport() {
 	if (isError) {
 		return (
 			<div className="flex items-center justify-center h-64 text-red-500 text-sm">
-				Erreur lors de la récupération des reports.
+				Erreur lors de la récupération des signalements.
 			</div>
 		);
 	}
@@ -88,9 +88,9 @@ export default function GestionReport() {
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center justify-between">
 				<div>
-					<h2 className="text-xl font-semibold text-gray-800">Reports</h2>
+					<h2 className="text-xl font-semibold text-gray-800">Signalement</h2>
 					<p className="text-sm text-gray-400">
-						{reports.length} report{reports.length !== 1 ? "s" : ""}
+						{reports.length} signalement{reports.length !== 1 ? "s" : ""}
 					</p>
 				</div>
 				<button
@@ -98,7 +98,7 @@ export default function GestionReport() {
 					className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
 				>
 					<span className="text-lg leading-none">+</span>
-					Ajouter un report
+					Ajouter un signalement
 				</button>
 			</div>
 
@@ -121,7 +121,7 @@ export default function GestionReport() {
 
 				{reports.length === 0 ? (
 					<div className="py-16 text-center text-sm text-gray-400">
-						Aucun report trouvé.
+						Aucun signalement trouvé.
 					</div>
 				) : (
 					reports.map((report: ReportInfoDto) => (

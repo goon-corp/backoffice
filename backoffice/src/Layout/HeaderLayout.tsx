@@ -6,7 +6,7 @@ const navLinks = [
 	{ to: "/gestion-user", label: "Utilisateurs", icon: "👤" },
 	{ to: "/gestion-ressource", label: "Ressources", icon: "📄" },
 	{ to: "/gestion-commentaire", label: "Commentaires", icon: "💬" },
-	{ to: "/gestion-report", label: "Rapports", icon: "📑" },
+	{ to: "/gestion-report", label: "Signalement", icon: "📑" },
 ];
 
 const HeaderLayout = () => {

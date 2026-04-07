@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useGetReport, useUpdateReport } from "../hooks/useReport";
 import { useGetReportTypes } from "../hooks/useReportType";
+import { useGetRessource } from "../hooks/useRessource";
+import { useGetUser } from "../hooks/useUser";
 
 type FormData = {
 	is_checked_by_moderator: boolean;
@@ -16,6 +18,12 @@ export default function EditionReport() {
 	const { data: report, isLoading } = useGetReport(id!);
 	const { mutate: updateReport, isPending } = useUpdateReport();
 	const { data: reportTypes = [] } = useGetReportTypes();
+	const { data: ressource } = useGetRessource(report?.ressource_id ?? "", {
+		enabled: !!report?.ressource_id,
+	});
+	const { data: user } = useGetUser(report?.user_id ?? "", {
+		enabled: !!report?.user_id,
+	});
 
 	const [formData, setFormData] = useState<FormData>({
 		is_checked_by_moderator: false,
@@ -94,11 +102,15 @@ export default function EditionReport() {
 					</div>
 					<div>
 						<span className="font-medium text-gray-700">Ressource : </span>
-						{report.ressource_id}
+						{ressource?.title ?? report.ressource_id}
 					</div>
 					<div>
 						<span className="font-medium text-gray-700">Utilisateur : </span>
-						{report.user_id}
+						{user
+							? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() ||
+								user.user_name ||
+								report.user_id
+							: report.user_id}
 					</div>
 					<div>
 						<span className="font-medium text-gray-700">Créé le : </span>
