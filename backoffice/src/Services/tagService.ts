@@ -1,8 +1,9 @@
 import { api } from "../lib/axios";
 import type { Tag, CreateTagDto, UpdateTagDto } from "../Types/TagTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
 export const tagService = {
-	getAll: async (): Promise<Tag[]> => {
+	getAll: async (): Promise<PaginatedResponse<Tag>> => {
 		const response = await api.get("/api/tags");
 		return response.data;
 	},

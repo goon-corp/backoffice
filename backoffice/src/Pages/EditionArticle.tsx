@@ -27,7 +27,8 @@ export default function EditionArticle({ id }: { id: string }) {
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } =
 		useGetRessourceConfidentialityTypes();
-	const { data: allTags = [] } = useGetTags();
+	const { data: tagsData } = useGetTags();
+	const allTags = tagsData?.items ?? [];
 	const { data: article, isLoading: isLoadingArticle } =
 		useGetArticleByRessource(id);
 	const ressource = article?.ressource;

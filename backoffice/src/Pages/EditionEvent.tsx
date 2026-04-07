@@ -33,7 +33,8 @@ export default function EditionEvent({ id }: { id: string }) {
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } =
 		useGetRessourceConfidentialityTypes();
-	const { data: allTags = [] } = useGetTags();
+	const { data: tagsData } = useGetTags();
+	const allTags = tagsData?.items ?? [];
 	const { data: event, isLoading: isLoadingEvent } =
 		useGetEventByRessource(id);
 	const ressource = event?.ressource;

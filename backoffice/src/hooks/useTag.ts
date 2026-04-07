@@ -1,8 +1,9 @@
 import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { tagService } from "../Services/tagService";
 import type { Tag, CreateTagDto, UpdateTagDto } from "../Types/TagTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
-export const useGetTags = (options?: UseQueryOptions<Tag[], Error>) => {
+export const useGetTags = (options?: UseQueryOptions<PaginatedResponse<Tag>, Error>) => {
 	return useQuery({
 		queryKey: ["tags"],
 		queryFn: () => tagService.getAll(),

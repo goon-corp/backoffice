@@ -45,7 +45,8 @@ export default function AjoutResource() {
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: types = [] } = useGetRessourceTypes();
 	const { data: confidentialityTypes = [] } = useGetRessourceConfidentialityTypes();
-	const { data: allTags = [] } = useGetTags();
+	const { data: tagsData } = useGetTags();
+	const allTags = tagsData?.items ?? [];
 
 	const { mutate: createArticle, isPending: isPendingArticle } = useCreateArticle();
 	const { mutate: createEvent, isPending: isPendingEvent } = useCreateEvent();

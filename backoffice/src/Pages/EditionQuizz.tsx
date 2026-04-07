@@ -41,7 +41,8 @@ export default function EditionQuizz({ id }: { id: string }) {
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } =
 		useGetRessourceConfidentialityTypes();
-	const { data: allTags = [] } = useGetTags();
+	const { data: tagsData } = useGetTags();
+	const allTags = tagsData?.items ?? [];
 	const { data: quizz, isLoading: isLoadingQuizz } =
 		useGetQuizzByRessource(id);
 	const ressource = quizz?.ressource;

@@ -29,7 +29,8 @@ export default function EditionPoll({ id }: { id: string }) {
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: confidentialityTypes = [] } =
 		useGetRessourceConfidentialityTypes();
-	const { data: allTags = [] } = useGetTags();
+	const { data: tagsData } = useGetTags();
+	const allTags = tagsData?.items ?? [];
 	const { data: poll, isLoading: isLoadingPoll } = useGetPollByRessource(id);
 	const ressource = poll?.ressource;
 
