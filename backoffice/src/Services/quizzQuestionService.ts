@@ -2,8 +2,13 @@ import { api } from "../lib/axios";
 import type { CreateQuizzQuestionDto, UpdateQuizzQuestionDto, CreateQuestionAnswerDto, QuizzQuestionInfoDto, QuestionAnswerInfoDto } from "../Types/QuizzQuestionTypes";
 
 export const quizzQuestionService = {
-  getAll: async (): Promise<QuizzQuestionInfoDto[]> => {
-    const response = await api.get("/api/quizzes-questions");
+  getAll: async (quizzId?: string): Promise<QuizzQuestionInfoDto[]> => {
+    const response = await api.get("/api/quizzes-questions", {
+      params: {
+        page_size: 100,
+        ...(quizzId ? { quizz_id: quizzId } : {}),
+      },
+    });
     return response.data.items ?? response.data;
   },
 

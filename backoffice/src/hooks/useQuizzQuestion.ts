@@ -2,10 +2,11 @@ import { useQuery, useMutation, useQueryClient, type UseQueryOptions, type UseMu
 import { quizzQuestionService } from "../Services/quizzQuestionService";
 import type { CreateQuizzQuestionDto, UpdateQuizzQuestionDto, CreateQuestionAnswerDto, QuizzQuestionInfoDto, QuestionAnswerInfoDto } from "../Types/QuizzQuestionTypes";
 
-export const useGetQuizzQuestions = (options?: UseQueryOptions<QuizzQuestionInfoDto[], Error>) => {
+export const useGetQuizzQuestions = (quizzId?: string, options?: UseQueryOptions<QuizzQuestionInfoDto[], Error>) => {
 	return useQuery({
-		queryKey: ["quizz-questions"],
-		queryFn: () => quizzQuestionService.getAll(),
+		queryKey: ["quizz-questions", quizzId],
+		queryFn: () => quizzQuestionService.getAll(quizzId),
+		enabled: !!quizzId,
 		...options,
 	});
 };

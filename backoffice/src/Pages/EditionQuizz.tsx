@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
 	useGetRessourceStatuses,
@@ -47,12 +47,8 @@ export default function EditionQuizz({ id }: { id: string }) {
 		useGetQuizzByRessource(id);
 	const ressource = quizz?.ressource;
 
-	const { data: allQuestions = [], isLoading: isLoadingQuestions } =
-		useGetQuizzQuestions();
-	const questions = useMemo(
-		() => (quizz ? allQuestions.filter((q) => q.quizz_id === quizz.id) : []),
-		[allQuestions, quizz],
-	);
+	const { data: questions = [], isLoading: isLoadingQuestions } =
+		useGetQuizzQuestions(quizz?.id);
 
 	const { mutate: updateQuizz, isPending } = useUpdateQuizz();
 	const { mutate: createQuestion } = useCreateQuizzQuestion();
@@ -145,7 +141,9 @@ export default function EditionQuizz({ id }: { id: string }) {
 		createQuestion(
 			{
 				question: newQ.question,
-				possible_answers: newQ.possible_answers || null,
+				possible_answers: newQ.possible_answers
+					? JSON.stringify(newQ.possible_answers.split(",").map((s) => s.trim()))
+					: null,
 				correct_answer: newQ.correct_answer || null,
 				quizz_id: quizz.id,
 			},
@@ -160,7 +158,9 @@ export default function EditionQuizz({ id }: { id: string }) {
 				id: q.id,
 				params: {
 					question: editingQ.question || null,
-					possible_answers: editingQ.possible_answers || null,
+					possible_answers: editingQ.possible_answers
+						? JSON.stringify(editingQ.possible_answers.split(",").map((s) => s.trim()))
+						: null,
 					correct_answer: editingQ.correct_answer || null,
 				},
 			},
