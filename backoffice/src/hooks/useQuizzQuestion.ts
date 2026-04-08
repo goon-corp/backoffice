@@ -5,7 +5,7 @@ import type { CreateQuizzQuestionDto, UpdateQuizzQuestionDto, CreateQuestionAnsw
 export const useGetQuizzQuestions = (quizzId?: string, options?: UseQueryOptions<QuizzQuestionInfoDto[], Error>) => {
 	return useQuery({
 		queryKey: ["quizz-questions", quizzId],
-		queryFn: () => quizzQuestionService.getAll(quizzId),
+		queryFn: () => quizzQuestionService.getAll(quizzId!),
 		enabled: !!quizzId,
 		...options,
 	});

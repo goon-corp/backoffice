@@ -1,13 +1,13 @@
 export type CreateQuizzQuestionDto = {
-  question: string | null;
-  possible_answers: string | null;
-  correct_answer: string | null;
+  question: string;
+  possible_answers: string[];
+  correct_answer: string;
   quizz_id: string;
 };
 
 export type UpdateQuizzQuestionDto = {
   question: string | null;
-  possible_answers: string | null;
+  possible_answers: string[] | null;
   correct_answer: string | null;
 };
 

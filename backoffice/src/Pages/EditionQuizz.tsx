@@ -142,9 +142,9 @@ export default function EditionQuizz({ id }: { id: string }) {
 			{
 				question: newQ.question,
 				possible_answers: newQ.possible_answers
-					? JSON.stringify(newQ.possible_answers.split(",").map((s) => s.trim()))
-					: null,
-				correct_answer: newQ.correct_answer || null,
+					? newQ.possible_answers.split(",").map((s) => s.trim())
+					: [],
+				correct_answer: newQ.correct_answer || "",
 				quizz_id: quizz.id,
 			},
 			{ onSuccess: () => setNewQ(emptyQuestion) },
@@ -159,7 +159,7 @@ export default function EditionQuizz({ id }: { id: string }) {
 				params: {
 					question: editingQ.question || null,
 					possible_answers: editingQ.possible_answers
-						? JSON.stringify(editingQ.possible_answers.split(",").map((s) => s.trim()))
+						? editingQ.possible_answers.split(",").map((s) => s.trim())
 						: null,
 					correct_answer: editingQ.correct_answer || null,
 				},
@@ -455,7 +455,15 @@ export default function EditionQuizz({ id }: { id: string }) {
 											{idx + 1}. {q.question ?? "—"}
 										</p>
 										<p className="text-xs text-gray-500 mt-1">
-											Réponses : {q.possible_answers ?? "—"}
+											Réponses :{" "}
+										{(() => {
+											try {
+												const parsed = JSON.parse(q.possible_answers ?? "");
+												return Array.isArray(parsed) ? parsed.join(", ") : q.possible_answers ?? "—";
+											} catch {
+												return q.possible_answers ?? "—";
+											}
+										})()}
 										</p>
 										<p className="text-xs text-green-600 mt-0.5">
 											Correcte : {q.correct_answer ?? "—"}
@@ -467,8 +475,14 @@ export default function EditionQuizz({ id }: { id: string }) {
 												setEditingQ({
 													id: q.id,
 													question: q.question ?? "",
-													possible_answers:
-														q.possible_answers ?? "",
+													possible_answers: (() => {
+														try {
+															const parsed = JSON.parse(q.possible_answers ?? "");
+															return Array.isArray(parsed) ? parsed.join(", ") : q.possible_answers ?? "";
+														} catch {
+															return q.possible_answers ?? "";
+														}
+													})(),
 													correct_answer:
 														q.correct_answer ?? "",
 												})
