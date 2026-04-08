@@ -29,7 +29,11 @@ type EventFields = {
 };
 type FormErrors = Partial<Record<string, string>>;
 
-function buildRessourceFormData(base: BaseFormData, typeId: string, prefix = "Ressource"): FormData {
+function buildRessourceFormData(
+	base: BaseFormData,
+	typeId: string,
+	prefix = "Ressource",
+): FormData {
 	const fd = new FormData();
 	fd.append(`${prefix}.Title`, base.title);
 	if (base.description) fd.append(`${prefix}.Description`, base.description);
@@ -44,17 +48,20 @@ export default function AjoutResource() {
 	const navigate = useNavigate();
 	const { data: statuses = [] } = useGetRessourceStatuses();
 	const { data: types = [] } = useGetRessourceTypes();
-	const { data: confidentialityTypes = [] } = useGetRessourceConfidentialityTypes();
+	const { data: confidentialityTypes = [] } =
+		useGetRessourceConfidentialityTypes();
 	const { data: tagsData } = useGetTags();
 	const allTags = tagsData?.items ?? [];
 
-	const { mutate: createArticle, isPending: isPendingArticle } = useCreateArticle();
+	const { mutate: createArticle, isPending: isPendingArticle } =
+		useCreateArticle();
 	const { mutate: createEvent, isPending: isPendingEvent } = useCreateEvent();
 	const { mutate: createPoll, isPending: isPendingPoll } = useCreatePoll();
 	const { mutate: createQuizz, isPending: isPendingQuizz } = useCreateQuizz();
 
 	const [selectedType, setSelectedType] = useState<string>("");
-	const selectedTypeLabel = types.find((t) => t.id === selectedType)?.label?.toLowerCase() ?? "";
+	const selectedTypeLabel =
+		types.find((t) => t.id === selectedType)?.label?.toLowerCase() ?? "";
 
 	const [baseForm, setBaseForm] = useState<BaseFormData>({
 		title: "",
@@ -64,7 +71,9 @@ export default function AjoutResource() {
 		tags: [],
 	});
 
-	const [articleFields, setArticleFields] = useState<ArticleFields>({ content: "" });
+	const [articleFields, setArticleFields] = useState<ArticleFields>({
+		content: "",
+	});
 	const [eventFields, setEventFields] = useState<EventFields>({
 		is_virtual: false,
 		date_start: "",
@@ -74,20 +83,28 @@ export default function AjoutResource() {
 	});
 
 	const [errors, setErrors] = useState<FormErrors>({});
-	const isPending = isPendingArticle || isPendingEvent || isPendingPoll || isPendingQuizz;
+	const isPending =
+		isPendingArticle || isPendingEvent || isPendingPoll || isPendingQuizz;
 
 	const validate = (): boolean => {
 		const next: FormErrors = {};
 		if (!baseForm.title.trim()) next.title = "Le titre est requis.";
 		if (!baseForm.status_id) next.status_id = "Le statut est requis.";
-		if (!baseForm.confidentiality_type_id) next.confidentiality_type_id = "La confidentialité est requise.";
+		if (!baseForm.confidentiality_type_id)
+			next.confidentiality_type_id = "La confidentialité est requise.";
 
 		if (selectedTypeLabel === "article") {
-			if (!articleFields.content.trim()) next.content = "Le contenu est requis.";
-		} else if (selectedTypeLabel === "event") {
-			if (!eventFields.date_start) next.date_start = "La date de début est requise.";
+			if (!articleFields.content.trim())
+				next.content = "Le contenu est requis.";
+		} else if (selectedTypeLabel === "événement") {
+			if (!eventFields.date_start)
+				next.date_start = "La date de début est requise.";
 			if (!eventFields.date_end) next.date_end = "La date de fin est requise.";
-			if (eventFields.date_start && eventFields.date_end && eventFields.date_start >= eventFields.date_end) {
+			if (
+				eventFields.date_start &&
+				eventFields.date_end &&
+				eventFields.date_start >= eventFields.date_end
+			) {
 				next.date_end = "La date de fin doit être après la date de début.";
 			}
 		}
@@ -96,7 +113,11 @@ export default function AjoutResource() {
 		return Object.keys(next).length === 0;
 	};
 
-	const handleBaseChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+	const handleBaseChange = (
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>,
+	) => {
 		const { name, value } = e.target;
 		setBaseForm((prev) => ({ ...prev, [name]: value }));
 	};
@@ -113,15 +134,20 @@ export default function AjoutResource() {
 			const fd = buildRessourceFormData(baseForm, selectedType);
 			fd.append("Content", articleFields.content);
 			createArticle(fd, { onSuccess, onError });
-		} else if (selectedTypeLabel === "event") {
-			const fd = buildRessourceFormData(baseForm, selectedType, "RessourceInfos");
+		} else if (selectedTypeLabel === "événement") {
+			const fd = buildRessourceFormData(
+				baseForm,
+				selectedType,
+				"RessourceInfos",
+			);
 			fd.append("IsVirtual", String(eventFields.is_virtual));
 			fd.append("DateStart", new Date(eventFields.date_start).toISOString());
 			fd.append("DateEnd", new Date(eventFields.date_end).toISOString());
-			if (eventFields.event_link) fd.append("EventLink", eventFields.event_link);
+			if (eventFields.event_link)
+				fd.append("EventLink", eventFields.event_link);
 			if (eventFields.location) fd.append("Location", eventFields.location);
 			createEvent(fd, { onSuccess, onError });
-		} else if (selectedTypeLabel === "poll") {
+		} else if (selectedTypeLabel === "sondage") {
 			const fd = buildRessourceFormData(baseForm, selectedType);
 			createPoll(fd, { onSuccess, onError });
 		} else if (selectedTypeLabel === "quizz") {
@@ -140,11 +166,15 @@ export default function AjoutResource() {
 					>
 						← Retour
 					</button>
-					<h2 className="text-xl font-semibold text-gray-800">Ajouter une ressource</h2>
+					<h2 className="text-xl font-semibold text-gray-800">
+						Ajouter une ressource
+					</h2>
 				</div>
 
 				<div className="bg-white rounded-xl border border-gray-200 p-6">
-					<p className="text-sm font-medium text-gray-700 mb-4">Choisissez le type de ressource :</p>
+					<p className="text-sm font-medium text-gray-700 mb-4">
+						Choisissez le type de ressource :
+					</p>
 					<div className="grid grid-cols-2 gap-3">
 						{types.map((t) => (
 							<button
@@ -171,7 +201,16 @@ export default function AjoutResource() {
 					← Retour
 				</button>
 				<h2 className="text-xl font-semibold text-gray-800">
-					Ajouter {selectedTypeLabel === "article" ? "un article" : selectedTypeLabel === "event" ? "un événement" : selectedTypeLabel === "poll" ? "un sondage" : selectedTypeLabel === "quizz" ? "un quiz" : "une ressource"}
+					Ajouter{" "}
+					{selectedTypeLabel === "article"
+						? "un article"
+						: selectedTypeLabel === "événement"
+							? "un événement"
+							: selectedTypeLabel === "sondage"
+								? "un sondage"
+								: selectedTypeLabel === "quizz"
+									? "un quiz"
+									: "une ressource"}
 				</h2>
 			</div>
 
@@ -179,7 +218,12 @@ export default function AjoutResource() {
 				<form onSubmit={handleSubmit} className="flex flex-col gap-5">
 					{/* Base fields */}
 					<div className="flex flex-col gap-1.5">
-						<label htmlFor="title" className="text-sm font-medium text-gray-700">Titre</label>
+						<label
+							htmlFor="title"
+							className="text-sm font-medium text-gray-700"
+						>
+							Titre
+						</label>
 						<input
 							type="text"
 							id="title"
@@ -188,11 +232,18 @@ export default function AjoutResource() {
 							onChange={handleBaseChange}
 							className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
 						/>
-						{errors.title && <span className="text-red-500 text-xs">{errors.title}</span>}
+						{errors.title && (
+							<span className="text-red-500 text-xs">{errors.title}</span>
+						)}
 					</div>
 
 					<div className="flex flex-col gap-1.5">
-						<label htmlFor="description" className="text-sm font-medium text-gray-700">Description</label>
+						<label
+							htmlFor="description"
+							className="text-sm font-medium text-gray-700"
+						>
+							Description
+						</label>
 						<textarea
 							id="description"
 							name="description"
@@ -205,7 +256,12 @@ export default function AjoutResource() {
 
 					<div className="grid grid-cols-2 gap-4">
 						<div className="flex flex-col gap-1.5">
-							<label htmlFor="status_id" className="text-sm font-medium text-gray-700">Statut</label>
+							<label
+								htmlFor="status_id"
+								className="text-sm font-medium text-gray-700"
+							>
+								Statut
+							</label>
 							<select
 								id="status_id"
 								name="status_id"
@@ -215,13 +271,22 @@ export default function AjoutResource() {
 							>
 								<option value="">Sélectionnez</option>
 								{statuses.map((s) => (
-									<option key={s.id} value={s.id}>{s.label ?? s.id}</option>
+									<option key={s.id} value={s.id}>
+										{s.label ?? s.id}
+									</option>
 								))}
 							</select>
-							{errors.status_id && <span className="text-red-500 text-xs">{errors.status_id}</span>}
+							{errors.status_id && (
+								<span className="text-red-500 text-xs">{errors.status_id}</span>
+							)}
 						</div>
 						<div className="flex flex-col gap-1.5">
-							<label htmlFor="confidentiality_type_id" className="text-sm font-medium text-gray-700">Confidentialité</label>
+							<label
+								htmlFor="confidentiality_type_id"
+								className="text-sm font-medium text-gray-700"
+							>
+								Confidentialité
+							</label>
 							<select
 								id="confidentiality_type_id"
 								name="confidentiality_type_id"
@@ -231,15 +296,23 @@ export default function AjoutResource() {
 							>
 								<option value="">Sélectionnez</option>
 								{confidentialityTypes.map((c) => (
-									<option key={c.id} value={c.id}>{c.label ?? c.id}</option>
+									<option key={c.id} value={c.id}>
+										{c.label ?? c.id}
+									</option>
 								))}
 							</select>
-							{errors.confidentiality_type_id && <span className="text-red-500 text-xs">{errors.confidentiality_type_id}</span>}
+							{errors.confidentiality_type_id && (
+								<span className="text-red-500 text-xs">
+									{errors.confidentiality_type_id}
+								</span>
+							)}
 						</div>
 					</div>
 
 					<div className="flex flex-col gap-1.5">
-						<label htmlFor="tags" className="text-sm font-medium text-gray-700">Tags</label>
+						<label htmlFor="tags" className="text-sm font-medium text-gray-700">
+							Tags
+						</label>
 						<select
 							id="tags"
 							className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition bg-white"
@@ -247,7 +320,10 @@ export default function AjoutResource() {
 							onChange={(e) => {
 								const tagId = e.target.value;
 								if (tagId && !baseForm.tags.includes(tagId)) {
-									setBaseForm((prev) => ({ ...prev, tags: [...prev.tags, tagId] }));
+									setBaseForm((prev) => ({
+										...prev,
+										tags: [...prev.tags, tagId],
+									}));
 								}
 							}}
 						>
@@ -255,7 +331,9 @@ export default function AjoutResource() {
 							{allTags
 								.filter((t) => !baseForm.tags.includes(t.id))
 								.map((t) => (
-									<option key={t.id} value={t.id}>{t.label ?? t.id}</option>
+									<option key={t.id} value={t.id}>
+										{t.label ?? t.id}
+									</option>
 								))}
 						</select>
 						{baseForm.tags.length > 0 && (
@@ -292,21 +370,30 @@ export default function AjoutResource() {
 						<>
 							<hr className="border-gray-200" />
 							<div className="flex flex-col gap-1.5">
-								<label htmlFor="content" className="text-sm font-medium text-gray-700">Contenu de l'article</label>
+								<label
+									htmlFor="content"
+									className="text-sm font-medium text-gray-700"
+								>
+									Contenu de l'article
+								</label>
 								<textarea
 									id="content"
 									name="content"
 									rows={10}
 									value={articleFields.content}
-									onChange={(e) => setArticleFields({ content: e.target.value })}
+									onChange={(e) =>
+										setArticleFields({ content: e.target.value })
+									}
 									className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition resize-none"
 								/>
-								{errors.content && <span className="text-red-500 text-xs">{errors.content}</span>}
+								{errors.content && (
+									<span className="text-red-500 text-xs">{errors.content}</span>
+								)}
 							</div>
 						</>
 					)}
 
-					{selectedTypeLabel === "event" && (
+					{selectedTypeLabel === "événement" && (
 						<>
 							<hr className="border-gray-200" />
 							<div className="flex items-center gap-3">
@@ -314,57 +401,115 @@ export default function AjoutResource() {
 									type="checkbox"
 									id="is_virtual"
 									checked={eventFields.is_virtual}
-									onChange={(e) => setEventFields((prev) => ({ ...prev, is_virtual: e.target.checked }))}
+									onChange={(e) =>
+										setEventFields((prev) => ({
+											...prev,
+											is_virtual: e.target.checked,
+										}))
+									}
 									className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 								/>
-								<label htmlFor="is_virtual" className="text-sm font-medium text-gray-700">Événement virtuel</label>
+								<label
+									htmlFor="is_virtual"
+									className="text-sm font-medium text-gray-700"
+								>
+									Événement virtuel
+								</label>
 							</div>
 
 							<div className="grid grid-cols-2 gap-4">
 								<div className="flex flex-col gap-1.5">
-									<label htmlFor="date_start" className="text-sm font-medium text-gray-700">Date de début</label>
+									<label
+										htmlFor="date_start"
+										className="text-sm font-medium text-gray-700"
+									>
+										Date de début
+									</label>
 									<input
 										type="datetime-local"
 										id="date_start"
 										value={eventFields.date_start}
-										onChange={(e) => setEventFields((prev) => ({ ...prev, date_start: e.target.value }))}
+										onChange={(e) =>
+											setEventFields((prev) => ({
+												...prev,
+												date_start: e.target.value,
+											}))
+										}
 										className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
 									/>
-									{errors.date_start && <span className="text-red-500 text-xs">{errors.date_start}</span>}
+									{errors.date_start && (
+										<span className="text-red-500 text-xs">
+											{errors.date_start}
+										</span>
+									)}
 								</div>
 								<div className="flex flex-col gap-1.5">
-									<label htmlFor="date_end" className="text-sm font-medium text-gray-700">Date de fin</label>
+									<label
+										htmlFor="date_end"
+										className="text-sm font-medium text-gray-700"
+									>
+										Date de fin
+									</label>
 									<input
 										type="datetime-local"
 										id="date_end"
 										value={eventFields.date_end}
-										onChange={(e) => setEventFields((prev) => ({ ...prev, date_end: e.target.value }))}
+										onChange={(e) =>
+											setEventFields((prev) => ({
+												...prev,
+												date_end: e.target.value,
+											}))
+										}
 										className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
 									/>
-									{errors.date_end && <span className="text-red-500 text-xs">{errors.date_end}</span>}
+									{errors.date_end && (
+										<span className="text-red-500 text-xs">
+											{errors.date_end}
+										</span>
+									)}
 								</div>
 							</div>
 
 							{eventFields.is_virtual ? (
 								<div className="flex flex-col gap-1.5">
-									<label htmlFor="event_link" className="text-sm font-medium text-gray-700">Lien de l'événement</label>
+									<label
+										htmlFor="event_link"
+										className="text-sm font-medium text-gray-700"
+									>
+										Lien de l'événement
+									</label>
 									<input
 										type="url"
 										id="event_link"
 										value={eventFields.event_link}
-										onChange={(e) => setEventFields((prev) => ({ ...prev, event_link: e.target.value }))}
+										onChange={(e) =>
+											setEventFields((prev) => ({
+												...prev,
+												event_link: e.target.value,
+											}))
+										}
 										placeholder="https://..."
 										className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
 									/>
 								</div>
 							) : (
 								<div className="flex flex-col gap-1.5">
-									<label htmlFor="location" className="text-sm font-medium text-gray-700">Lieu</label>
+									<label
+										htmlFor="location"
+										className="text-sm font-medium text-gray-700"
+									>
+										Lieu
+									</label>
 									<input
 										type="text"
 										id="location"
 										value={eventFields.location}
-										onChange={(e) => setEventFields((prev) => ({ ...prev, location: e.target.value }))}
+										onChange={(e) =>
+											setEventFields((prev) => ({
+												...prev,
+												location: e.target.value,
+											}))
+										}
 										className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
 									/>
 								</div>
@@ -372,11 +517,12 @@ export default function AjoutResource() {
 						</>
 					)}
 
-					{selectedTypeLabel === "poll" && (
+					{selectedTypeLabel === "sondage" && (
 						<>
 							<hr className="border-gray-200" />
 							<p className="text-xs text-gray-400">
-								Les options du sondage pourront être ajoutées après la création, via la page d'édition.
+								Les options du sondage pourront être ajoutées après la création,
+								via la page d'édition.
 							</p>
 						</>
 					)}
@@ -385,7 +531,8 @@ export default function AjoutResource() {
 						<>
 							<hr className="border-gray-200" />
 							<p className="text-xs text-gray-400">
-								Les questions du quiz pourront être ajoutées après la création, via la page d'édition.
+								Les questions du quiz pourront être ajoutées après la création,
+								via la page d'édition.
 							</p>
 						</>
 					)}

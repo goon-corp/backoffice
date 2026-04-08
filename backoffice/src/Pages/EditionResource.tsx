@@ -19,9 +19,9 @@ export default function EditionResource() {
 	switch (searchParams.get("type")) {
 		case "Article":
 			return <EditionArticle id={id} />;
-		case "Poll":
+		case "Sondage":
 			return <EditionPoll id={id} />;
-		case "Event":
+		case "Événement":
 			return <EditionEvent id={id} />;
 		case "Quizz":
 			return <EditionQuizz id={id} />;

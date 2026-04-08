@@ -4,7 +4,7 @@ import type { CreateQuizzQuestionDto, UpdateQuizzQuestionDto, CreateQuestionAnsw
 export const quizzQuestionService = {
   getAll: async (): Promise<QuizzQuestionInfoDto[]> => {
     const response = await api.get("/api/quizzes-questions");
-    return response.data;
+    return response.data.items ?? response.data;
   },
 
   getById: async (id: string): Promise<QuizzQuestionInfoDto> => {
