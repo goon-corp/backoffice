@@ -3,7 +3,9 @@ import { useNavigate } from "react-router";
 import * as jose from "jose";
 import { useLogin } from "../../hooks/useAuth";
 import { userStore } from "../../Store/userStore";
-import type { User } from "../../Types/UserTypes";
+import { userService } from "../../Services/userService";
+import { userRoleService } from "../../Services/userRoleService";
+import type { User, UserInfoDto } from "../../Types/UserTypes";
 
 type Toast = { message: string; type: "error" | "success" };
 
@@ -21,23 +23,46 @@ const LoginForm = () => {
 	}, [toast]);
 
 	const loginMutation = useLogin({
-		onSuccess: (data) => {
+		onSuccess: async (data) => {
 			const claims = jose.decodeJwt(data.access_token);
-
-			const user: User = {
-				id: claims.sub ?? "",
-				first_name: (claims.first_name as string) ?? null,
-				last_name: (claims.last_name as string) ?? null,
-				user_name: (claims.user_name as string) ?? null,
-				is_active: true,
-				creation_time: "",
-				update_time: null,
-				deletion_time: null,
-				user_role_id: (claims.user_role_id as string) ?? "",
-			};
 
 			const expires = new Date((claims.exp as number) * 1000).toUTCString();
 			document.cookie = `sessionToken=${data.access_token}; Expires=${expires}; Secure; SameSite=Strict`;
+
+			let me: UserInfoDto;
+			try {
+				const [meResult, roles] = await Promise.all([
+					userService.getMe(),
+					userRoleService.getAll(),
+				]);
+				me = meResult;
+
+				const userRole = roles.find((role) => role.id === me.user_role_id);
+
+				if (!userRole || userRole.role_label !== "Administrateur") {
+					document.cookie =
+						"sessionToken=; Expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; SameSite=Strict";
+					setToast({ message: "Accès refusé. Ce backoffice est réservé aux administrateurs.", type: "error" });
+					return;
+				}
+			} catch {
+				document.cookie =
+					"sessionToken=; Expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; SameSite=Strict";
+				setToast({ message: "Une erreur est survenue lors de la vérification des droits.", type: "error" });
+				return;
+			}
+
+			const user: User = {
+				id: me.id,
+				first_name: me.first_name,
+				last_name: me.last_name,
+				user_name: me.user_name,
+				is_active: me.is_active,
+				creation_time: me.creation_time,
+				update_time: me.update_time,
+				deletion_time: me.deletion_time,
+				user_role_id: me.user_role_id,
+			};
 
 			setUserConnected(user);
 			navigate("/");
@@ -58,7 +83,6 @@ const LoginForm = () => {
 			client: "web",
 			params: { email: formData.email, password: formData.password },
 		});
-		console.log(formData);
 	};
 
 	return (

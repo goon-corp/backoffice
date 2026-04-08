@@ -20,7 +20,7 @@ export const userService = {
 
   getMe: async (): Promise<UserInfoDto> => {
     const response = await api.get("/api/user/me");
-    return response.data.data;
+    return response.data;
   },
 
   create: async (params: CreateUserDto): Promise<UserInfoDto> => {
