@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient, type UseQueryOptions, type UseMutationOptions } from "@tanstack/react-query";
 import { pollOptionService } from "../Services/pollOptionService";
 import type { CreatePollOptionDto, UpdatePollOptionDto, PollOptionInfoDto } from "../Types/PollOptionTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
-export const useGetPollOptions = (options?: UseQueryOptions<PollOptionInfoDto[], Error>) => {
+export const useGetPollOptions = (options?: UseQueryOptions<PaginatedResponse<PollOptionInfoDto>, Error>) => {
 	return useQuery({
 		queryKey: ["poll-options"],
 		queryFn: () => pollOptionService.getAll(),

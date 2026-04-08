@@ -34,11 +34,14 @@ export default function EditionPoll({ id }: { id: string }) {
 	const { data: poll, isLoading: isLoadingPoll } = useGetPollByRessource(id);
 	const ressource = poll?.ressource;
 
-	const { data: allOptions = [], isLoading: isLoadingOptions } =
+	const { data: optionsData, isLoading: isLoadingOptions } =
 		useGetPollOptions();
 	const options = useMemo(
-		() => (poll ? allOptions.filter((o) => o.poll_id === poll.id) : []),
-		[allOptions, poll],
+		() => {
+			const allOptions = optionsData?.items ?? [];
+			return poll ? allOptions.filter((o) => o.poll_id === poll.id) : [];
+		},
+		[optionsData, poll],
 	);
 
 	const { mutate: updatePoll, isPending } = useUpdatePoll();

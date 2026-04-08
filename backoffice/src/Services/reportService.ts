@@ -8,17 +8,17 @@ import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
 export const reportService = {
 	getAll: async (): Promise<PaginatedResponse<ReportInfoDto>> => {
-		const response = await api.get("/api/report");
+		const response = await api.get("/api/reports");
 		return response.data;
 	},
 
 	getById: async (id: string): Promise<ReportInfoDto> => {
-		const response = await api.get(`/api/report/${id}`);
+		const response = await api.get(`/api/reports/${id}`);
 		return response.data;
 	},
 
 	create: async (params: CreateReportDto): Promise<ReportInfoDto> => {
-		const response = await api.post("/api/report", params);
+		const response = await api.post("/api/reports", params);
 		return response.data;
 	},
 
@@ -26,11 +26,11 @@ export const reportService = {
 		id: string,
 		params: UpdateReportDto,
 	): Promise<ReportInfoDto> => {
-		const response = await api.put(`/api/report/${id}`, params);
+		const response = await api.put(`/api/reports/${id}`, params);
 		return response.data;
 	},
 
 	delete: async (id: string): Promise<void> => {
-		await api.delete(`/api/report/${id}`);
+		await api.delete(`/api/reports/${id}`);
 	},
 };

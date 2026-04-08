@@ -1,8 +1,9 @@
 import { api } from "../lib/axios";
 import type { CreatePollOptionDto, UpdatePollOptionDto, PollOptionInfoDto } from "../Types/PollOptionTypes";
+import type { PaginatedResponse } from "../Types/PaginatedResponse";
 
 export const pollOptionService = {
-  getAll: async (): Promise<PollOptionInfoDto[]> => {
+  getAll: async (): Promise<PaginatedResponse<PollOptionInfoDto>> => {
     const response = await api.get("/api/PollOption");
     return response.data;
   },
