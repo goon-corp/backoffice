@@ -5,8 +5,9 @@ import { useGetReports } from "../hooks/useReport";
 import { useGetComments } from "../hooks/useComment";
 import KpiView from "../Components/Dashboard/KpiView";
 import AnalyticsView from "../Components/Dashboard/AnalyticsView";
+import RelationView from "../Components/Dashboard/RelationView";
 
-type Tab = "kpi" | "analytics";
+type Tab = "kpi" | "analytics" | "relation";
 
 export default function Dashboard() {
 	const [tab, setTab] = useState<Tab>("kpi");
@@ -77,6 +78,16 @@ export default function Dashboard() {
 					>
 						Analytics
 					</button>
+					<button
+						onClick={() => setTab("relation")}
+						className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+							tab === "relation"
+								? "bg-white text-gray-800 shadow-sm"
+								: "text-gray-500 hover:text-gray-700"
+						}`}
+					>
+						Relation
+					</button>
 				</div>
 			</div>
 
@@ -102,6 +113,8 @@ export default function Dashboard() {
 					top5Liked={top5Liked}
 				/>
 			)}
+
+			{tab === "relation" && <RelationView />}
 		</div>
 	);
 }
