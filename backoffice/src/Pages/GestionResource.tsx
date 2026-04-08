@@ -17,6 +17,7 @@ export default function GestionResource() {
 	const [title, setTitle] = useState("");
 	const [type, setType] = useState("");
 	const [isDeleted, setIsDeleted] = useState(false);
+	const [page, setPage] = useState(1);
 
 	const { data: types = [] } = useGetRessourceTypes();
 
@@ -24,6 +25,7 @@ export default function GestionResource() {
 		...(title && { RessourceTitle: title }),
 		...(type && { RessourceType: type }),
 		IsDeleted: isDeleted,
+		page,
 	};
 
 	const {
@@ -54,7 +56,7 @@ export default function GestionResource() {
 				<div>
 					<h2 className="text-xl font-semibold text-gray-800">Ressources</h2>
 					<p className="text-sm text-gray-400">
-						{ressources.length} ressource{ressources.length !== 1 ? "s" : ""}
+						{data?.total_count ?? ressources.length} ressource{(data?.total_count ?? ressources.length) !== 1 ? "s" : ""}
 					</p>
 				</div>
 				<button
@@ -71,12 +73,12 @@ export default function GestionResource() {
 					type="text"
 					placeholder="Filtrer par titre…"
 					value={title}
-					onChange={(e) => setTitle(e.target.value)}
+					onChange={(e) => { setTitle(e.target.value); setPage(1); }}
 					className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition w-60"
 				/>
 				<select
 					value={type}
-					onChange={(e) => setType(e.target.value)}
+					onChange={(e) => { setType(e.target.value); setPage(1); }}
 					className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
 				>
 					<option value="">Tous les types</option>
@@ -90,7 +92,7 @@ export default function GestionResource() {
 					<input
 						type="checkbox"
 						checked={isDeleted}
-						onChange={(e) => setIsDeleted(e.target.checked)}
+						onChange={(e) => { setIsDeleted(e.target.checked); setPage(1); }}
 						className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
 					/>
 					Afficher les supprimées
@@ -157,6 +159,28 @@ export default function GestionResource() {
 					))
 				)}
 			</div>
+
+				{(data?.total_pages ?? 1) > 1 && (
+					<div className="flex items-center justify-between">
+						<button
+							disabled={!data?.has_previous_page}
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							Précédent
+						</button>
+						<span className="text-sm text-gray-500">
+							Page {data?.page_index ?? page} sur {data?.total_pages ?? 1}
+						</span>
+						<button
+							disabled={!data?.has_next_page}
+							onClick={() => setPage((p) => p + 1)}
+							className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							Suivant
+						</button>
+					</div>
+				)}
 		</div>
 	);
 }
