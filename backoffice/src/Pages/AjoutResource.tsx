@@ -10,6 +10,159 @@ import { useCreateEvent } from "../hooks/useEvent";
 import { useCreatePoll } from "../hooks/usePoll";
 import { useCreateQuizz } from "../hooks/useQuizz";
 import { useGetTags } from "../hooks/useTag";
+import { quizzQuestionService } from "../Services/quizzQuestionService";
+
+// ─── Quiz types ───────────────────────────────────────────────────────────────
+
+interface QuizAnswer { id: string; text: string; }
+interface QuizQuestion { id: string; question: string; answers: QuizAnswer[]; correctAnswerId: string; }
+
+function generateId(): string { return Math.random().toString(36).slice(2, 9); }
+
+function makeDefaultQuestion(): QuizQuestion {
+	const a1 = { id: generateId(), text: "" };
+	const a2 = { id: generateId(), text: "" };
+	return { id: generateId(), question: "", answers: [a1, a2], correctAnswerId: a1.id };
+}
+
+// ─── QuizQuestionCard ─────────────────────────────────────────────────────────
+
+function QuizQuestionCard({ question, index, hasError, onUpdate, onDelete }: {
+	question: QuizQuestion; index: number; hasError: boolean;
+	onUpdate: (q: QuizQuestion) => void; onDelete: () => void;
+}) {
+	const addAnswer = () => {
+		if (question.answers.length >= 6) return;
+		onUpdate({ ...question, answers: [...question.answers, { id: generateId(), text: "" }] });
+	};
+
+	const updateAnswer = (id: string, text: string) =>
+		onUpdate({ ...question, answers: question.answers.map((a) => (a.id === id ? { ...a, text } : a)) });
+
+	const deleteAnswer = (id: string) => {
+		const next = question.answers.filter((a) => a.id !== id);
+		onUpdate({ ...question, answers: next, correctAnswerId: question.correctAnswerId === id ? (next[0]?.id ?? "") : question.correctAnswerId });
+	};
+
+	return (
+		<div className={`rounded-lg border ${hasError ? "border-red-400" : "border-gray-200"} bg-white mb-3 overflow-hidden`}>
+			<div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+				<span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
+					{index + 1}
+				</span>
+				<span className="flex-1 text-sm font-medium text-gray-700">Question {index + 1}</span>
+				<button type="button" onClick={onDelete} className="p-1 hover:text-red-500 text-gray-400 transition">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+				</button>
+			</div>
+			<div className="p-4 flex flex-col gap-3">
+				<div className="flex flex-col gap-1">
+					<label className="text-xs font-medium text-gray-600">Énoncé</label>
+					<textarea
+						rows={2}
+						placeholder="Ex : Quelle est la capitale de la France ?"
+						value={question.question}
+						onChange={(e) => onUpdate({ ...question, question: e.target.value })}
+						className="px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition resize-none"
+					/>
+				</div>
+				<div>
+					<p className="text-xs font-medium text-gray-600 mb-2">
+						Réponses <span className="text-gray-400 font-normal">— cliquez pour marquer la bonne réponse</span>
+					</p>
+					{question.answers.map((answer, i) => {
+						const isCorrect = answer.id === question.correctAnswerId;
+						return (
+							<div
+								key={answer.id}
+								onClick={() => onUpdate({ ...question, correctAnswerId: answer.id })}
+								className={`flex items-center gap-2 border rounded-lg px-3 py-2 mb-1.5 cursor-pointer transition ${isCorrect ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white hover:border-gray-300"}`}
+							>
+								<div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${isCorrect ? "border-blue-500" : "border-gray-300"}`}>
+									{isCorrect && <div className="w-2 h-2 rounded-full bg-blue-500" />}
+								</div>
+								<input
+									type="text"
+									placeholder={`Réponse ${i + 1}…`}
+									value={answer.text}
+									onChange={(e) => { e.stopPropagation(); updateAnswer(answer.id, e.target.value); }}
+									onClick={(e) => e.stopPropagation()}
+									className="flex-1 border-none outline-none bg-transparent text-sm text-gray-800"
+								/>
+								{question.answers.length > 2 && (
+									<button
+										type="button"
+										onClick={(e) => { e.stopPropagation(); deleteAnswer(answer.id); }}
+										className="p-0.5 text-gray-400 hover:text-red-400 transition flex-shrink-0"
+									>
+										<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+									</button>
+								)}
+							</div>
+						);
+					})}
+					{question.answers.length < 6 && (
+						<button
+							type="button"
+							onClick={addAnswer}
+							className="flex items-center gap-1.5 w-full border border-dashed border-blue-300 rounded-lg py-2 justify-center text-blue-600 text-xs hover:bg-blue-50 transition mt-1"
+						>
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+							Ajouter une réponse
+						</button>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+}
+
+// ─── QuizQuestionsBuilder ─────────────────────────────────────────────────────
+
+function QuizQuestionsBuilder({ questions, onChange, error }: {
+	questions: QuizQuestion[];
+	onChange: (q: QuizQuestion[]) => void;
+	error?: string;
+}) {
+	const firstErrorIndex = error
+		? questions.findIndex((q) => !q.question.trim() || q.answers.filter((a) => a.text.trim()).length < 2 || !q.answers.find((a) => a.id === q.correctAnswerId && a.text.trim()))
+		: -1;
+
+	return (
+		<div className="flex flex-col gap-3">
+			<div className="flex items-center gap-2">
+				<span className="text-sm font-medium text-gray-700">Questions du quiz</span>
+				<span className="min-w-[22px] h-[22px] rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center px-1.5">
+					{questions.length}
+				</span>
+			</div>
+			<p className="text-xs text-gray-400">Ajoutez au moins 1 question avec 2 réponses possibles.</p>
+			{error && (
+				<p className="text-xs text-red-500 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">{error}</p>
+			)}
+			{questions.map((q, i) => (
+				<QuizQuestionCard
+					key={q.id}
+					question={q}
+					index={i}
+					hasError={!!error && i === firstErrorIndex}
+					onUpdate={(updated) => { const next = [...questions]; next[i] = updated; onChange(next); }}
+					onDelete={() => { if (questions.length <= 1) return; onChange(questions.filter((_, j) => j !== i)); }}
+				/>
+			))}
+			<button
+				type="button"
+				onClick={() => onChange([...questions, makeDefaultQuestion()])}
+				className="flex items-center justify-center gap-2 w-full border border-dashed border-blue-400 rounded-lg py-3 bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition"
+			>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+				Ajouter une question
+			</button>
+		</div>
+	);
+}
+
+// ─── Form types ───────────────────────────────────────────────────────────────
 
 type BaseFormData = {
 	title: string;
@@ -44,6 +197,8 @@ function buildRessourceFormData(
 	return fd;
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function AjoutResource() {
 	const navigate = useNavigate();
 	const { data: statuses = [] } = useGetRessourceStatuses();
@@ -53,11 +208,11 @@ export default function AjoutResource() {
 	const { data: tagsData } = useGetTags();
 	const allTags = tagsData?.items ?? [];
 
-	const { mutate: createArticle, isPending: isPendingArticle } =
+	const { mutateAsync: createArticle, isPending: isPendingArticle } =
 		useCreateArticle();
-	const { mutate: createEvent, isPending: isPendingEvent } = useCreateEvent();
-	const { mutate: createPoll, isPending: isPendingPoll } = useCreatePoll();
-	const { mutate: createQuizz, isPending: isPendingQuizz } = useCreateQuizz();
+	const { mutateAsync: createEvent, isPending: isPendingEvent } = useCreateEvent();
+	const { mutateAsync: createPoll, isPending: isPendingPoll } = useCreatePoll();
+	const { mutateAsync: createQuizz, isPending: isPendingQuizz } = useCreateQuizz();
 
 	const [selectedType, setSelectedType] = useState<string>("");
 	const selectedTypeLabel =
@@ -81,10 +236,13 @@ export default function AjoutResource() {
 		event_link: "",
 		location: "",
 	});
+	const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(() => [makeDefaultQuestion()]);
 
 	const [errors, setErrors] = useState<FormErrors>({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
 	const isPending =
-		isPendingArticle || isPendingEvent || isPendingPoll || isPendingQuizz;
+		isPendingArticle || isPendingEvent || isPendingPoll || isPendingQuizz || isSubmitting;
 
 	const validate = (): boolean => {
 		const next: FormErrors = {};
@@ -107,6 +265,16 @@ export default function AjoutResource() {
 			) {
 				next.date_end = "La date de fin doit être après la date de début.";
 			}
+		} else if (selectedTypeLabel === "quizz") {
+			if (quizQuestions.length === 0) {
+				next.quizQuestions = "Ajoutez au moins une question.";
+			} else {
+				for (const q of quizQuestions) {
+					if (!q.question.trim()) { next.quizQuestions = "Chaque question doit avoir un énoncé."; break; }
+					if (q.answers.filter((a) => a.text.trim()).length < 2) { next.quizQuestions = "Chaque question doit avoir au moins 2 réponses remplies."; break; }
+					if (!q.answers.find((a) => a.id === q.correctAnswerId && a.text.trim())) { next.quizQuestions = "Sélectionnez la bonne réponse pour chaque question."; break; }
+				}
+			}
 		}
 
 		setErrors(next);
@@ -122,37 +290,50 @@ export default function AjoutResource() {
 		setBaseForm((prev) => ({ ...prev, [name]: value }));
 	};
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setErrors({});
 		if (!validate()) return;
 
-		const onSuccess = () => navigate("/gestion-ressource");
-		const onError = () => setErrors({ general: "Erreur lors de la création." });
-
-		if (selectedTypeLabel === "article") {
-			const fd = buildRessourceFormData(baseForm, selectedType);
-			fd.append("Content", articleFields.content);
-			createArticle(fd, { onSuccess, onError });
-		} else if (selectedTypeLabel === "événement") {
-			const fd = buildRessourceFormData(
-				baseForm,
-				selectedType,
-				"RessourceInfos",
-			);
-			fd.append("IsVirtual", String(eventFields.is_virtual));
-			fd.append("DateStart", new Date(eventFields.date_start).toISOString());
-			fd.append("DateEnd", new Date(eventFields.date_end).toISOString());
-			if (eventFields.event_link)
-				fd.append("EventLink", eventFields.event_link);
-			if (eventFields.location) fd.append("Location", eventFields.location);
-			createEvent(fd, { onSuccess, onError });
-		} else if (selectedTypeLabel === "sondage") {
-			const fd = buildRessourceFormData(baseForm, selectedType);
-			createPoll(fd, { onSuccess, onError });
-		} else if (selectedTypeLabel === "quizz") {
-			const fd = buildRessourceFormData(baseForm, selectedType);
-			createQuizz(fd, { onSuccess, onError });
+		setIsSubmitting(true);
+		try {
+			if (selectedTypeLabel === "article") {
+				const fd = buildRessourceFormData(baseForm, selectedType);
+				fd.append("Content", articleFields.content);
+				await createArticle(fd);
+			} else if (selectedTypeLabel === "événement") {
+				const fd = buildRessourceFormData(
+					baseForm,
+					selectedType,
+					"RessourceInfos",
+				);
+				fd.append("IsVirtual", String(eventFields.is_virtual));
+				fd.append("DateStart", new Date(eventFields.date_start).toISOString());
+				fd.append("DateEnd", new Date(eventFields.date_end).toISOString());
+				if (eventFields.event_link)
+					fd.append("EventLink", eventFields.event_link);
+				if (eventFields.location) fd.append("Location", eventFields.location);
+				await createEvent(fd);
+			} else if (selectedTypeLabel === "sondage") {
+				const fd = buildRessourceFormData(baseForm, selectedType);
+				await createPoll(fd);
+			} else if (selectedTypeLabel === "quizz") {
+				const fd = buildRessourceFormData(baseForm, selectedType);
+				const quizz = await createQuizz(fd);
+				for (const q of quizQuestions) {
+					await quizzQuestionService.create({
+						question: q.question.trim(),
+						possible_answers: q.answers.map((a) => a.text.trim()),
+						correct_answer: q.answers.find((a) => a.id === q.correctAnswerId)?.text.trim() ?? "",
+						quizz_id: quizz.id,
+					});
+				}
+			}
+			navigate("/gestion-ressource");
+		} catch {
+			setErrors({ general: "Erreur lors de la création." });
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -530,10 +711,11 @@ export default function AjoutResource() {
 					{selectedTypeLabel === "quizz" && (
 						<>
 							<hr className="border-gray-200" />
-							<p className="text-xs text-gray-400">
-								Les questions du quiz pourront être ajoutées après la création,
-								via la page d'édition.
-							</p>
+							<QuizQuestionsBuilder
+								questions={quizQuestions}
+								onChange={setQuizQuestions}
+								error={errors.quizQuestions}
+							/>
 						</>
 					)}
 

@@ -48,13 +48,13 @@ export default function GestionUser() {
 						{users.length} utilisateur{users.length !== 1 ? "s" : ""}
 					</p>
 				</div>
-				<button
+				{/* <button
 					onClick={() => navigate("/user/ajout-utilisateur")}
 					className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
 				>
 					<span className="text-lg leading-none">+</span>
 					Ajouter un utilisateur
-				</button>
+				</button> */}
 			</div>
 
 			<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
