@@ -1,11 +1,5 @@
-import "./App.css";
+import Dashboard from "./Pages/Dashboard";
 
-function App() {
-	return (
-		<>
-			<h1>Welcome HomePage</h1>
-		</>
-	);
+export default function App() {
+	return <Dashboard />;
 }
-
-export default App;
